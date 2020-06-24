@@ -5,7 +5,11 @@
     <UserSecretsId>3351687f-4fd2-46db-8f0a-573606887b1f</UserSecretsId>
   </PropertyGroup>
   <ItemGroup>
-    <PackageReference Include="Microsoft.NET.Sdk.Functions" Version="3.0.3" />
+    <PackageReference Include="Microsoft.Azure.Cosmos.Table" Version="1.0.7" />
+    <PackageReference Include="Microsoft.NET.Sdk.Functions" Version="3.0.7" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\ServerlessCrudClassLibrary\ServerlessCrudClassLibrary.csproj" />
   </ItemGroup>
   <ItemGroup>
     <None Update="host.json">

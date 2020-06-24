@@ -3,7 +3,9 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 16
 VisualStudioVersion = 16.0.30204.135
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ServerlessCrudCreateFunction", "ServerlessCrudCreateFunction\ServerlessCrudCreateFunction.csproj", "{10CD8EAE-6142-487B-9E99-2CD556E88265}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ServerlessCrudCreateFunction", "ServerlessCrudCreateFunction\ServerlessCrudCreateFunction.csproj", "{10CD8EAE-6142-487B-9E99-2CD556E88265}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ServerlessCrudClassLibrary", "ServerlessCrudClassLibrary\ServerlessCrudClassLibrary.csproj", "{FE95B3D7-0C0F-4A22-9132-89110E5A5A11}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -15,6 +17,10 @@ Global
 		{10CD8EAE-6142-487B-9E99-2CD556E88265}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{10CD8EAE-6142-487B-9E99-2CD556E88265}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{10CD8EAE-6142-487B-9E99-2CD556E88265}.Release|Any CPU.Build.0 = Release|Any CPU
+		{FE95B3D7-0C0F-4A22-9132-89110E5A5A11}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{FE95B3D7-0C0F-4A22-9132-89110E5A5A11}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{FE95B3D7-0C0F-4A22-9132-89110E5A5A11}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{FE95B3D7-0C0F-4A22-9132-89110E5A5A11}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
