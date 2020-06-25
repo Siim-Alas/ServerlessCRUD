@@ -1,4 +1,5 @@
 ﻿using Microsoft.JSInterop;
+using Newtonsoft.Json;
 using ServerlessCrudClassLibrary;
 using System;
 using System.Collections.Generic;
@@ -29,6 +30,23 @@ namespace ServerlessCrudBlazorUI.Services
             catch
             {
                 return new HttpResponseMessage(System.Net.HttpStatusCode.BadRequest);
+            }
+        }
+
+        public async Task<ListBlogPostEntitiesRequest> PostListBlogPostsRequestAsync(ListBlogPostEntitiesRequest request)
+        {
+            try
+            {
+                return JsonConvert.DeserializeObject<ListBlogPostEntitiesRequest>(
+                    await (await _client.PostAsJsonAsync(
+                           "https://serverlesscrud.azurewebsites.net/api/ListBlogPostEntities?code=H90/2vxRzA/kzfaqzhhd9yUCYdFDVJMj//6UedXW8rCgbBX1C6oUSQ==",
+                           request
+                           )).Content.ReadAsStringAsync()
+                    );
+            }
+            catch
+            {
+                return request;
             }
         }
     }

@@ -1,0 +1,37 @@
+﻿@page "/blogposts"
+
+@using ServerlessCrudClassLibrary
+@using Services
+@inject CrudFunctionAPIClient crudClient
+
+<h3>BlogPostListView</h3>
+
+@foreach (BlogPostEntity post in request.BlogPosts)
+{
+    <div class="card">
+        <div class="card-header">
+            <h4>
+                @post.PartitionKey
+            </h4>
+            <p>
+                <small>By @post.RowKey -- Last Updated @post.Timestamp</small>
+            </p>
+        </div>
+        <div class="card-body">
+           <p class="card-text">
+               @post.Text
+           </p>
+        </div>
+    </div>
+}
+
+<button type="button" @onclick="OnButtonClicked">Update</button>
+
+@code {
+    private ListBlogPostEntitiesRequest request { get; set; } = new ListBlogPostEntitiesRequest();
+
+    private async Task OnButtonClicked()
+    {
+        request = await crudClient.PostListBlogPostsRequestAsync(request);
+    }
+}

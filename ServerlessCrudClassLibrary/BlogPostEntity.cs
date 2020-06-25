@@ -6,6 +6,10 @@ namespace ServerlessCrudClassLibrary
 {
     public class BlogPostEntity : TableEntity
     {
+        public BlogPostEntity() : base()
+        {
+            
+        }
         public BlogPostEntity(string title, string author, string text = "")
         {
             PartitionKey = title;
