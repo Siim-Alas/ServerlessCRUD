@@ -23,7 +23,7 @@ namespace ServerlessCrudBlazorUI.Services
             try
             {
                 return await _client.PostAsJsonAsync(
-                    "https://serverlesscrud.azurewebsites.net/api/CreateBlogPostEntity?code=pOCEtr1TPGJ0rS5QPoewt7j5RQIy8NmLR3OLuBtD/sjyqbQ9tmKXdw==",
+                    "https://serverlesscrud.azurewebsites.net/api/InsertOrMergeBlogPostEntity?code=daYVnhnXf3c4fNZJF3DLbRinnLuI8aAxpw9t2gfb7aVasuCFq6I4RQ==",
                     blogPost);
             }
             catch
