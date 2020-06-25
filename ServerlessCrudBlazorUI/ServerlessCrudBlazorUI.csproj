@@ -10,7 +10,11 @@
     <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly.Build" Version="3.2.0" PrivateAssets="all" />
     <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly.DevServer" Version="3.2.0" PrivateAssets="all" />
     <PackageReference Include="Microsoft.Authentication.WebAssembly.Msal" Version="3.2.0" />
-    <PackageReference Include="System.Net.Http.Json" Version="3.2.0" />
+    <PackageReference Include="System.Net.Http.Json" Version="3.2.1" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\ServerlessCrudClassLibrary\ServerlessCrudClassLibrary.csproj" />
   </ItemGroup>
 
 </Project>

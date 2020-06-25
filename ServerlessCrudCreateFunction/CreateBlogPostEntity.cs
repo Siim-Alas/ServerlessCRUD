@@ -10,6 +10,7 @@ using Newtonsoft.Json;
 using Microsoft.Azure.Cosmos.Table;
 using ServerlessCrudClassLibrary;
 using System.Web.Http;
+using System.Net;
 
 namespace ServerlessCrudCreateFunction
 {
@@ -30,7 +31,9 @@ namespace ServerlessCrudCreateFunction
             CloudTable table = tableClient.GetTableReference(tableName);
             await table.CreateIfNotExistsAsync();
 
-            BlogPostEntity blogPost = new BlogPostEntity("dummy title 2", "dummy author");
+            BlogPostEntity blogPost = JsonConvert.DeserializeObject<BlogPostEntity>(
+                await req.ReadAsStringAsync()
+                );
 
             TableOperation insertOrMergeOperation = TableOperation.InsertOrMerge(blogPost);
             TableResult result = await table.ExecuteAsync(insertOrMergeOperation);

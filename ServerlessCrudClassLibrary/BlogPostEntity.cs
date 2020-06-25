@@ -1,5 +1,6 @@
 ﻿using Microsoft.Azure.Cosmos.Table;
 using System;
+using System.ComponentModel.DataAnnotations;
 
 namespace ServerlessCrudClassLibrary
 {
@@ -11,7 +12,7 @@ namespace ServerlessCrudClassLibrary
             RowKey = author;
             Text = text;
         }
-
+        [Required]
         public string Text { get; set; }
     }
 }

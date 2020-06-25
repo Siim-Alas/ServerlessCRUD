@@ -1,7 +1,27 @@
 ﻿@page "/blogposteditor"
 
+@using ServerlessCrudClassLibrary
+@using Services
+@inject CrudFunctionAPIClient crudClient
+
 <h3>BlogPostEditor</h3>
 
-@code {
+<EditForm Model="blogPost" OnValidSubmit="OnValidSubmit">
+    Post Title
+    <InputText @bind-Value="blogPost.PartitionKey"></InputText>
+    Author
+    <InputText @bind-Value="blogPost.RowKey"></InputText>
+    Text
+    <InputTextArea @bind-Value="blogPost.Text"></InputTextArea>
 
+    <button type="submit" value="Submit"></button>
+</EditForm>
+
+@code {
+    private BlogPostEntity blogPost { get; set; } = new BlogPostEntity("title", "author", "text");
+
+    private async Task OnValidSubmit()
+    {
+        Console.WriteLine((await crudClient.PostBlogPostAsync(blogPost)).StatusCode);
+    }
 }
