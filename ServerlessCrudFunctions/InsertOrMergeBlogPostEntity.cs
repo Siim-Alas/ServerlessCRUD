@@ -10,6 +10,7 @@ using Newtonsoft.Json;
 using Microsoft.Azure.Cosmos.Table;
 using ServerlessCrudClassLibrary;
 using System.Web.Http;
+using System.ComponentModel;
 
 namespace ServerlessCrudFunctions
 {
@@ -30,6 +31,11 @@ namespace ServerlessCrudFunctions
                 BlogPostEntity blogPost = JsonConvert.DeserializeObject<BlogPostEntity>(
                     await req.ReadAsStringAsync()
                     );
+
+                if (!blogPost.IsValid)
+                {
+                    throw new FormatException("The BlogPostEntity.Isvalid check failed.");
+                }
 
                 TableOperation insertOrMergeOperation = TableOperation.InsertOrMerge(blogPost);
                 TableResult result = await table.ExecuteAsync(insertOrMergeOperation);

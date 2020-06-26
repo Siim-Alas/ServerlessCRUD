@@ -2,6 +2,7 @@
 using Newtonsoft.Json;
 using System;
 using System.ComponentModel.DataAnnotations;
+using System.Text.RegularExpressions;
 
 namespace ServerlessCrudClassLibrary
 {
@@ -49,6 +50,22 @@ namespace ServerlessCrudClassLibrary
         {
             get { return RowKey.Substring(RowKey.LastIndexOf('_') + 1); }
             set { SetRowKey(Title, value); }
+        }
+        /// <summary>
+        /// Checks if the PartitionKey and RowKey values are valid and that Timestamp and Text are not null.
+        /// </summary>
+        [IgnoreProperty]
+        [JsonIgnore]
+        public bool IsValid 
+        { 
+            get 
+            {
+                return 
+                    Regex.IsMatch(PartitionKey, @"^[0-9]{4}_[0-9]{2}$") && 
+                    Regex.IsMatch(RowKey, @"^[0-9]{19}_.+_.+$") && 
+                    Timestamp != null &&
+                    Text != null;
+            }
         }
         /// <summary>
         /// Sets the RowKey in the format (REVERSETICKS_TITLE_AUTHOR).

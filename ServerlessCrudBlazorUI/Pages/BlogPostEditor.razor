@@ -25,7 +25,10 @@
 
     private async Task OnValidSubmit()
     {
-        Console.WriteLine((await crudClient.PostBlogPostAsync(blogPost)).StatusCode);
+        if (blogPost.IsValid)
+        {
+            Console.WriteLine((await crudClient.PostBlogPostAsync(blogPost)).StatusCode);
+        }
     }
 
     protected override async Task OnInitializedAsync()
