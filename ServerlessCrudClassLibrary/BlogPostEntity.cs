@@ -19,7 +19,7 @@ namespace ServerlessCrudClassLibrary
         /// <param name="text">The text of the post.</param>
         public BlogPostEntity(string title, string author, string text = "")
         {
-            PartitionKey = DateTime.UtcNow.ToString("yyyy MM");
+            PartitionKey = DateTime.UtcNow.ToString("yyyy_MM");
             SetRowKey(title, author);
             Text = text;
         }
