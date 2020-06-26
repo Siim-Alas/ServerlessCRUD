@@ -65,5 +65,19 @@ namespace ServerlessCrudBlazorUI.Services
                 return new BlogPostEntity("Error", "Blazor Bot", "Something has gone wrong processing your request.");
             }
         }
+
+        public async Task<HttpResponseMessage> PostDeleteBlogPostEntityAsync(BlogPostEntity blogPost)
+        {
+            try
+            {
+                return await _client.PostAsJsonAsync(
+                    "https://serverlesscrud.azurewebsites.net/api/DeleteBlogPostEntity?code=gnZTJP8y3gxQdpJx6YyTbngYZd3t8ERP5Uy1/iyBW4EOPcigzgpHVQ==",
+                    blogPost);
+            }
+            catch
+            {
+                return new HttpResponseMessage(System.Net.HttpStatusCode.BadRequest);
+            }
+        }
     }
 }

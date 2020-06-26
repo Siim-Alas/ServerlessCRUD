@@ -25,13 +25,19 @@
     </div>
 }
 
-<button type="button" @onclick="OnButtonClicked">Update</button>
+<button type="button" @onclick="UpdatePosts">Update</button>
 
 @code {
     private ListBlogPostEntitiesRequest request { get; set; } = new ListBlogPostEntitiesRequest();
 
-    private async Task OnButtonClicked()
+    private async Task UpdatePosts()
     {
         request = await crudClient.PostListBlogPostsRequestAsync(request);
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        await base.OnInitializedAsync();
+        await UpdatePosts();
     }
 }

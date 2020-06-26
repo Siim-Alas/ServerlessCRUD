@@ -37,7 +37,7 @@ namespace ServerlessCrudFunctions
                 request.BlogPosts = result.Results;
                 request.ContinuationToken = result.ContinuationToken;
 
-                log.LogInformation($"function ListBlogPostEntities -- got response with '{result.Results.Count}' entities from table '{table.Name}'");
+                log.LogInformation($"function ListBlogPostEntities -- got response with '{result.Results.Count}' entities from table '{table.Name}'.");
 
                 return new OkObjectResult(request);
             }

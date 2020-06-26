@@ -6,6 +6,7 @@
 @using Services
 @inject CrudFunctionAPIClient crudClient
 @inject NavigationManager navigationManager
+@inject IJSRuntime JsRuntime
 
 <h3>BlogPostEditor</h3>
 
@@ -20,6 +21,8 @@
     <button type="submit">Submit</button>
 </EditForm>
 
+<button type="button" @onclick="OnDeleteButtonClicked">Delete</button>
+
 @code {
     private BlogPostEntity blogPost { get; set; } = new BlogPostEntity("title", "author", "text");
 
@@ -27,7 +30,29 @@
     {
         if (blogPost.IsValid)
         {
-            Console.WriteLine((await crudClient.PostBlogPostAsync(blogPost)).StatusCode);
+            await JsRuntime.InvokeVoidAsync(
+                "alert",
+                ((await crudClient.PostBlogPostAsync(blogPost)).StatusCode == System.Net.HttpStatusCode.OK) ?
+                "Your blog post has been saved." : "Something went wrong.");
+
+            navigationManager.NavigateTo("/blogposts");
+        }
+    }
+
+    private async Task OnDeleteButtonClicked()
+    {
+        if ((blogPost.IsValid) &&
+            (await JsRuntime.InvokeAsync<bool>(
+                "confirm",
+                "Are you sure you want to delete the post? This cannot be undone."
+           )))
+        {
+            await JsRuntime.InvokeVoidAsync(
+                "alert",
+                ((await crudClient.PostDeleteBlogPostEntityAsync(blogPost)).StatusCode == System.Net.HttpStatusCode.OK) ?
+                "Your blog post has been deleted." : "Something went wrong.");
+
+            navigationManager.NavigateTo("/blogposts");
         }
     }
 

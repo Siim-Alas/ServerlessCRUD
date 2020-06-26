@@ -31,7 +31,7 @@ namespace ServerlessCrudFunctions
                     req.Query["partitionkey"], 
                     req.Query["rowkey"]));
 
-                log.LogInformation($"function ReadBlogPostEntity -- got response '{result.HttpStatusCode}' from table '{table.Name}'");
+                log.LogInformation($"function ReadBlogPostEntity -- got response '{result.HttpStatusCode}' from table '{table.Name}'.");
 
                 return new OkObjectResult(JsonConvert.SerializeObject((BlogPostEntity)result.Result));
             }
