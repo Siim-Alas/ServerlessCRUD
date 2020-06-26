@@ -49,5 +49,21 @@ namespace ServerlessCrudBlazorUI.Services
                 return request;
             }
         }
+
+        public async Task<BlogPostEntity> GetBlogPostEntityAsync(string partitionKey, string rowKey)
+        {
+            try
+            {
+                return JsonConvert.DeserializeObject<BlogPostEntity>(
+                    await (await _client.GetAsync(
+                        $"https://serverlesscrud.azurewebsites.net/api/ReadBlogPostEntity?partitionkey={partitionKey}&rowkey={rowKey}&code=Dl1wYTdW8GT/DpFhCqK5n2qawDEzg2/teLB3pF4mpZWQNcj6vgsyHA=="
+                        )).Content.ReadAsStringAsync()
+                    );
+            }
+            catch
+            {
+                return new BlogPostEntity("Error", "Blazor Bot", "Something has gone wrong processing your request.");
+            }
+        }
     }
 }

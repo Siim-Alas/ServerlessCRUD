@@ -11,7 +11,7 @@
     <div class="card">
         <div class="card-header">
             <h4>
-                @post.Title
+                <a href="@($"/detail/{post.PartitionKey}/{post.RowKey}")">@post.Title</a>
             </h4>
             <p>
                 <small>By @post.Author -- Last Updated @post.Timestamp.ToLocalTime()</small>

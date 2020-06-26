@@ -7,7 +7,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ServerlessCrudClassLibrary"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ServerlessCrudBlazorUI", "ServerlessCrudBlazorUI\ServerlessCrudBlazorUI.csproj", "{52851833-1266-4C8E-AA3B-519F61FA5A3E}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ServerlessCrudFunctions", "ServerlessCrudFunctions\ServerlessCrudFunctions.csproj", "{EFE01B9A-7558-4B2B-B917-C8905FF407B1}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ServerlessCrudFunctions", "ServerlessCrudFunctions\ServerlessCrudFunctions.csproj", "{EFE01B9A-7558-4B2B-B917-C8905FF407B1}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

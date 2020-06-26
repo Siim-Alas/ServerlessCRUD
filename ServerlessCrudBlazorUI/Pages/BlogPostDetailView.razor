@@ -1,0 +1,37 @@
+﻿@page "/detail/{partitionKey}/{rowKey}"
+
+@using ServerlessCrudClassLibrary
+@using Services
+@inject CrudFunctionAPIClient crudClient
+
+<h3>BlogPostDetailView</h3>
+
+<div>
+    <h4>
+        @blogPost.Title
+    </h4>
+    <p>
+        <small>By @blogPost.Author -- Last Updated @blogPost.Timestamp.ToLocalTime()</small>
+    </p>
+</div>
+<div>
+    <p>
+        @blogPost.Text
+    </p>
+</div>
+
+@code {
+    [Parameter]
+    public string PartitionKey { get; set; }
+    [Parameter]
+    public string RowKey { get; set; }
+
+    private BlogPostEntity blogPost { get; set; } = new BlogPostEntity("", "");
+
+    protected override async Task OnInitializedAsync()
+    {
+        await base.OnInitializedAsync();
+
+        blogPost = await crudClient.GetBlogPostEntityAsync(PartitionKey, RowKey);
+    }
+}
