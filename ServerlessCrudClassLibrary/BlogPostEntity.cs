@@ -79,5 +79,15 @@ namespace ServerlessCrudClassLibrary
                     title,
                     author);
         }
+        public BlogPostEntity Clone()
+        {
+            return new BlogPostEntity() { 
+                PartitionKey = PartitionKey, 
+                RowKey = RowKey, 
+                Timestamp = Timestamp,
+                ETag = ETag,
+                Text = Text
+            };
+        }
     }
 }

@@ -21,10 +21,12 @@
     <button type="submit">Submit</button>
 </EditForm>
 
+<button type="button" @onclick="OnRollbackButtonClicked">Rollback</button>
 <button type="button" @onclick="OnDeleteButtonClicked">Delete</button>
 
 @code {
     private BlogPostEntity blogPost { get; set; } = new BlogPostEntity("title", "author", "text");
+    private BlogPostEntity backup { get; set; }
 
     private async Task OnValidSubmit()
     {
@@ -39,6 +41,11 @@
         }
     }
 
+    private void OnRollbackButtonClicked()
+    {
+        blogPost = backup.Clone();
+    }
+
     private async Task OnDeleteButtonClicked()
     {
         if ((blogPost.IsValid) &&
@@ -49,7 +56,7 @@
         {
             await JsRuntime.InvokeVoidAsync(
                 "alert",
-                ((await crudClient.PostDeleteBlogPostEntityAsync(blogPost)).StatusCode == System.Net.HttpStatusCode.OK) ?
+                ((await crudClient.PostDeleteBlogPostEntityAsync(backup)).StatusCode == System.Net.HttpStatusCode.OK) ?
                 "Your blog post has been deleted." : "Something went wrong.");
 
             navigationManager.NavigateTo("/blogposts");
@@ -67,5 +74,7 @@
         {
             blogPost = await crudClient.GetBlogPostEntityAsync(pk, rk);
         }
+
+        backup = blogPost.Clone();
     }
 }
