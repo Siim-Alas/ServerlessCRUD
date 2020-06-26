@@ -8,9 +8,9 @@
 
 <EditForm Model="blogPost" OnValidSubmit="OnValidSubmit">
     Post Title
-    <InputText @bind-Value="blogPost.PartitionKey"></InputText>
+    <InputText @bind-Value="blogPost.Title"></InputText>
     Author
-    <InputText @bind-Value="blogPost.RowKey"></InputText>
+    <InputText @bind-Value="blogPost.Author"></InputText>
     Text
     <InputTextArea @bind-Value="blogPost.Text"></InputTextArea>
 
@@ -18,7 +18,7 @@
 </EditForm>
 
 @code {
-    private BlogPostEntity blogPost { get; set; } = new BlogPostEntity("title", "author", "text");
+    private BlogPostEntity blogPost { get; set; } = new BlogPostEntity("author", "title", "text");
 
     private async Task OnValidSubmit()
     {
