@@ -1,8 +1,11 @@
-﻿@page "/blogposteditor"
+﻿@page "/editor"
 
+@using Microsoft.AspNetCore.WebUtilities
+@using Microsoft.Extensions.Primitives
 @using ServerlessCrudClassLibrary
 @using Services
 @inject CrudFunctionAPIClient crudClient
+@inject NavigationManager navigationManager
 
 <h3>BlogPostEditor</h3>
 
@@ -23,5 +26,18 @@
     private async Task OnValidSubmit()
     {
         Console.WriteLine((await crudClient.PostBlogPostAsync(blogPost)).StatusCode);
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        await base.OnInitializedAsync();
+
+        Uri uri = navigationManager.ToAbsoluteUri(navigationManager.Uri);
+
+        if ((QueryHelpers.ParseQuery(uri.Query).TryGetValue("partitionkey", out StringValues pk)) &&
+            (QueryHelpers.ParseQuery(uri.Query).TryGetValue("rowkey", out StringValues rk)))
+        {
+            blogPost = await crudClient.GetBlogPostEntityAsync(pk, rk);
+        }
     }
 }

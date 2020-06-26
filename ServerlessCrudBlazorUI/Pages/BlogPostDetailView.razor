@@ -1,8 +1,10 @@
 ﻿@page "/detail/{partitionKey}/{rowKey}"
 
+@using Microsoft.AspNetCore.WebUtilities
 @using ServerlessCrudClassLibrary
 @using Services
 @inject CrudFunctionAPIClient crudClient
+@inject NavigationManager navigationManager
 
 <h3>BlogPostDetailView</h3>
 
@@ -18,6 +20,9 @@
     <p>
         @blogPost.Text
     </p>
+</div>
+<div>
+    <a href="@($"/editor?partitionkey={PartitionKey}&rowkey={RowKey}")">Edit</a>
 </div>
 
 @code {
