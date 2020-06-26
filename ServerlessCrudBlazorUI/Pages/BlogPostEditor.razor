@@ -18,7 +18,7 @@
 </EditForm>
 
 @code {
-    private BlogPostEntity blogPost { get; set; } = new BlogPostEntity("author", "title", "text");
+    private BlogPostEntity blogPost { get; set; } = new BlogPostEntity("title", "author", "text");
 
     private async Task OnValidSubmit()
     {

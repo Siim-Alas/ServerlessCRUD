@@ -9,6 +9,7 @@ using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using Microsoft.Azure.Cosmos.Table;
 using ServerlessCrudClassLibrary;
+using System.Web.Http;
 
 namespace ServerlessCrudFunctions
 {
@@ -20,20 +21,28 @@ namespace ServerlessCrudFunctions
             [Table("blogposts", "AzureWebJobsStorage")] CloudTable table,
             ILogger log)
         {
-            log.LogInformation("function CreateBlogPostEntity -- started processing request.");
+            log.LogInformation("function InsertOrMergeBlogPostEntity -- started processing request.");
 
-            await table.CreateIfNotExistsAsync();
+            try
+            {
+                await table.CreateIfNotExistsAsync();
 
-            BlogPostEntity blogPost = JsonConvert.DeserializeObject<BlogPostEntity>(
-                await req.ReadAsStringAsync()
-                );
+                BlogPostEntity blogPost = JsonConvert.DeserializeObject<BlogPostEntity>(
+                    await req.ReadAsStringAsync()
+                    );
 
-            TableOperation insertOrMergeOperation = TableOperation.InsertOrMerge(blogPost);
-            TableResult result = await table.ExecuteAsync(insertOrMergeOperation);
+                TableOperation insertOrMergeOperation = TableOperation.InsertOrMerge(blogPost);
+                TableResult result = await table.ExecuteAsync(insertOrMergeOperation);
 
-            log.LogInformation($"function CreateBlogPostEntity -- got response '{result.HttpStatusCode}' from table '{table.Name}'");
+                log.LogInformation($"function InsertOrMergeBlogPostEntity -- got response '{result.HttpStatusCode}' from table '{table.Name}'");
 
-            return new OkResult();
+                return new OkResult();
+            }
+            catch (Exception e)
+            {
+                log.LogInformation($"function InsertOrMergeBlogPostEntity -- caught exception {e} {e.Message} {e.StackTrace}");
+                return new InternalServerErrorResult();
+            }
         }
     }
 }

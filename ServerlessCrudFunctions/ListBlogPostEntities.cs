@@ -10,6 +10,7 @@ using Newtonsoft.Json;
 using ServerlessCrudClassLibrary;
 using System.Collections.Generic;
 using Microsoft.Azure.Cosmos.Table;
+using System.Web.Http;
 
 namespace ServerlessCrudFunctions
 {
@@ -23,18 +24,28 @@ namespace ServerlessCrudFunctions
         {
             log.LogInformation("function ListBlogPostEntities -- started processing request.");
 
-            ListBlogPostEntitiesRequest request = JsonConvert.DeserializeObject<ListBlogPostEntitiesRequest>(
-                await req.ReadAsStringAsync()
-                );
+            try
+            {
+                ListBlogPostEntitiesRequest request = JsonConvert.DeserializeObject<ListBlogPostEntitiesRequest>(
+                    await req.ReadAsStringAsync()
+                    );
 
-            var result = await table.ExecuteQuerySegmentedAsync(new TableQuery<BlogPostEntity>(), request.ContinuationToken);
-            
-            request.BlogPosts = result.Results;
-            request.ContinuationToken = result.ContinuationToken;
+                var result = await table.ExecuteQuerySegmentedAsync(
+                    new TableQuery<BlogPostEntity>() { TakeCount = request.TakeCount },
+                    request.ContinuationToken);
 
-            log.LogInformation($"function CreateBlogPostEntity -- got response with '{result.Results.Count}' entities from table '{table.Name}'");
+                request.BlogPosts = result.Results;
+                request.ContinuationToken = result.ContinuationToken;
 
-            return new OkObjectResult(request);
+                log.LogInformation($"function ListBlogPostEntities -- got response with '{result.Results.Count}' entities from table '{table.Name}'");
+
+                return new OkObjectResult(request);
+            }
+            catch (Exception e)
+            {
+                log.LogInformation($"function ListBlogPostEntities -- caught exception {e} {e.Message} {e.StackTrace}");
+                return new InternalServerErrorResult();
+            }
         }
     }
 }
