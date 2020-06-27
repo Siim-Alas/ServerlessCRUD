@@ -1,5 +1,6 @@
 ﻿@page "/editor"
 
+@using Microsoft.AspNetCore.Components.WebAssembly.Authentication
 @using Microsoft.AspNetCore.WebUtilities
 @using Microsoft.Extensions.Primitives
 @using ServerlessCrudClassLibrary
@@ -7,31 +8,43 @@
 @inject CrudFunctionAPIClient crudClient
 @inject NavigationManager navigationManager
 @inject IJSRuntime JsRuntime
+@inject AuthenticationStateProvider authStateProvider
 
 <h3>BlogPostEditor</h3>
 
 <EditForm Model="blogPost" OnValidSubmit="OnValidSubmit">
-    Post Title
-    <InputText @bind-Value="blogPost.Title"></InputText>
-    Author
-    <InputText @bind-Value="blogPost.Author"></InputText>
-    Text
+    @if (blogPostAlreadyExists)
+    {
+        <h4>@blogPost.Title</h4>
+        <p>By @blogPost.Author -- last edited on @blogPost.Timestamp.UtcDateTime.ToLocalTime()</p>
+    }
+    else
+    {
+        <label>Post Title</label>
+        <InputText @bind-Value="blogPost.Title"></InputText>
+    }
+    <label>Text</label>
     <InputTextArea @bind-Value="blogPost.Text"></InputTextArea>
 
     <button type="submit">Submit</button>
 </EditForm>
 
-<button type="button" @onclick="OnRollbackButtonClicked">Rollback</button>
-<button type="button" @onclick="OnDeleteButtonClicked">Delete</button>
+@if (blogPostAlreadyExists)
+{
+    <button type="button" @onclick="OnRollbackButtonClicked">Rollback</button>
+    <button type="button" @onclick="OnDeleteButtonClicked">Delete</button>
+}
 
 @code {
     private BlogPostEntity blogPost { get; set; } = new BlogPostEntity("title", "author", "text");
     private BlogPostEntity backup { get; set; }
+    private bool blogPostAlreadyExists { get; set; } = false;
 
     private async Task OnValidSubmit()
     {
         if (blogPost.IsValid)
         {
+            blogPost.Author = (await authStateProvider.GetAuthenticationStateAsync()).User.Identity.Name;
             await JsRuntime.InvokeVoidAsync(
                 "alert",
                 ((await crudClient.PostBlogPostAsync(blogPost)).StatusCode == System.Net.HttpStatusCode.OK) ?
@@ -72,6 +85,7 @@
         if ((QueryHelpers.ParseQuery(uri.Query).TryGetValue("partitionkey", out StringValues pk)) &&
             (QueryHelpers.ParseQuery(uri.Query).TryGetValue("rowkey", out StringValues rk)))
         {
+            blogPostAlreadyExists = true;
             blogPost = await crudClient.GetBlogPostEntityAsync(pk, rk);
         }
 

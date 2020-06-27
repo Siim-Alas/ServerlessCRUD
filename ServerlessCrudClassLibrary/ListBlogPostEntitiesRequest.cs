@@ -7,7 +7,7 @@ namespace ServerlessCrudClassLibrary
 {
     public class ListBlogPostEntitiesRequest
     {
-        public ListBlogPostEntitiesRequest(int takeCount = 20, 
+        public ListBlogPostEntitiesRequest(int takeCount = 4, 
                                            TableContinuationToken continuationToken = null,
                                            List<BlogPostEntity> blogPosts = null)
         {

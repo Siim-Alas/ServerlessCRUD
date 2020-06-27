@@ -1,10 +1,12 @@
-﻿using Microsoft.JSInterop;
+﻿using Microsoft.AspNetCore.Components.Authorization;
+using Microsoft.JSInterop;
 using Newtonsoft.Json;
 using ServerlessCrudClassLibrary;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http;
+using System.Net.Http.Headers;
 using System.Net.Http.Json;
 using System.Threading.Tasks;
 
@@ -14,10 +16,9 @@ namespace ServerlessCrudBlazorUI.Services
     {
         private readonly HttpClient _client;
 
-        public CrudFunctionAPIClient(HttpClient client)
+        public CrudFunctionAPIClient(IHttpClientFactory factory)
         {
-            _client = client;
-            _client.BaseAddress = new Uri("https://serverlesscrud.azurewebsites.net/api/");
+            _client = factory.CreateClient("CrudAPI");
         }
 
         public async Task<HttpResponseMessage> PostBlogPostAsync(BlogPostEntity blogPost)
@@ -38,6 +39,7 @@ namespace ServerlessCrudBlazorUI.Services
         {
             try
             {
+                Console.WriteLine(_client.DefaultRequestHeaders.Authorization);
                 return JsonConvert.DeserializeObject<ListBlogPostEntitiesRequest>(
                     await (await _client.PostAsJsonAsync(
                            "ListBlogPostEntities?code=H90/2vxRzA/kzfaqzhhd9yUCYdFDVJMj//6UedXW8rCgbBX1C6oUSQ==",
@@ -45,8 +47,9 @@ namespace ServerlessCrudBlazorUI.Services
                            )).Content.ReadAsStringAsync()
                     );
             }
-            catch
+            catch (Exception e)
             {
+                Console.WriteLine(e);
                 return request;
             }
         }

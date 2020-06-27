@@ -11,6 +11,7 @@ using ServerlessCrudClassLibrary;
 using System.Collections.Generic;
 using Microsoft.Azure.Cosmos.Table;
 using System.Web.Http;
+using System.Security.Claims;
 
 namespace ServerlessCrudFunctions
 {
@@ -20,12 +21,16 @@ namespace ServerlessCrudFunctions
         public static async Task<IActionResult> Run(
             [HttpTrigger(AuthorizationLevel.Function, "post", Route = null)] HttpRequest req,
             [Table("blogposts", "AzureWebJobsStorage")] CloudTable table,
+            ClaimsPrincipal principal,
             ILogger log)
         {
             log.LogInformation("function ListBlogPostEntities -- started processing request.");
 
             try
             {
+                log.LogInformation(string.Join("; ", principal.Claims));
+                log.LogInformation(string.Join(" || ", req.Headers.GetCommaSeparatedValues(" -> ")));
+
                 ListBlogPostEntitiesRequest request = JsonConvert.DeserializeObject<ListBlogPostEntitiesRequest>(
                     await req.ReadAsStringAsync()
                     );
