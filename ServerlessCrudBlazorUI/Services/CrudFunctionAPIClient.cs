@@ -17,6 +17,7 @@ namespace ServerlessCrudBlazorUI.Services
         public CrudFunctionAPIClient(HttpClient client)
         {
             _client = client;
+            _client.BaseAddress = new Uri("https://serverlesscrud.azurewebsites.net/api/");
         }
 
         public async Task<HttpResponseMessage> PostBlogPostAsync(BlogPostEntity blogPost)
@@ -24,7 +25,7 @@ namespace ServerlessCrudBlazorUI.Services
             try
             {
                 return await _client.PostAsJsonAsync(
-                    "https://serverlesscrud.azurewebsites.net/api/InsertOrMergeBlogPostEntity?code=daYVnhnXf3c4fNZJF3DLbRinnLuI8aAxpw9t2gfb7aVasuCFq6I4RQ==",
+                    "InsertOrMergeBlogPostEntity?code=daYVnhnXf3c4fNZJF3DLbRinnLuI8aAxpw9t2gfb7aVasuCFq6I4RQ==",
                     blogPost);
             }
             catch
@@ -39,7 +40,7 @@ namespace ServerlessCrudBlazorUI.Services
             {
                 return JsonConvert.DeserializeObject<ListBlogPostEntitiesRequest>(
                     await (await _client.PostAsJsonAsync(
-                           "https://serverlesscrud.azurewebsites.net/api/ListBlogPostEntities?code=H90/2vxRzA/kzfaqzhhd9yUCYdFDVJMj//6UedXW8rCgbBX1C6oUSQ==",
+                           "ListBlogPostEntities?code=H90/2vxRzA/kzfaqzhhd9yUCYdFDVJMj//6UedXW8rCgbBX1C6oUSQ==",
                            request
                            )).Content.ReadAsStringAsync()
                     );
@@ -56,7 +57,7 @@ namespace ServerlessCrudBlazorUI.Services
             {
                 return JsonConvert.DeserializeObject<BlogPostEntity>(
                     await (await _client.GetAsync(
-                        $"https://serverlesscrud.azurewebsites.net/api/ReadBlogPostEntity?partitionkey={partitionKey}&rowkey={rowKey}&code=Dl1wYTdW8GT/DpFhCqK5n2qawDEzg2/teLB3pF4mpZWQNcj6vgsyHA=="
+                        $"ReadBlogPostEntity?partitionkey={partitionKey}&rowkey={rowKey}&code=Dl1wYTdW8GT/DpFhCqK5n2qawDEzg2/teLB3pF4mpZWQNcj6vgsyHA=="
                         )).Content.ReadAsStringAsync()
                     );
             }
@@ -71,7 +72,7 @@ namespace ServerlessCrudBlazorUI.Services
             try
             {
                 return await _client.PostAsJsonAsync(
-                    "https://serverlesscrud.azurewebsites.net/api/DeleteBlogPostEntity?code=gnZTJP8y3gxQdpJx6YyTbngYZd3t8ERP5Uy1/iyBW4EOPcigzgpHVQ==",
+                    "DeleteBlogPostEntity?code=gnZTJP8y3gxQdpJx6YyTbngYZd3t8ERP5Uy1/iyBW4EOPcigzgpHVQ==",
                     blogPost);
             }
             catch
