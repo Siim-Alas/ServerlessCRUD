@@ -17,7 +17,7 @@ namespace ServerlessCrudFunctions
     {
         [FunctionName("ReadBlogPostEntity")]
         public static async Task<IActionResult> Run(
-            [HttpTrigger(AuthorizationLevel.Function, "get", Route = null)] HttpRequest req,
+            [HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = null)] HttpRequest req,
             [Table("blogposts", "AzureWebJobsStorage")] CloudTable table,
             ILogger log)
         {

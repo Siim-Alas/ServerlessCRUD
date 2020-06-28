@@ -17,7 +17,7 @@ namespace ServerlessCrudFunctions
     {
         [FunctionName("DeleteBlogPostEntity")]
         public static async Task<IActionResult> Run(
-            [HttpTrigger(AuthorizationLevel.Function, "get", "post", Route = null)] HttpRequest req,
+            [HttpTrigger(AuthorizationLevel.Anonymous, "post", Route = null)] HttpRequest req,
             [Table("blogposts", "AzureWebJobsStorage")] CloudTable table,
             ILogger log)
         {

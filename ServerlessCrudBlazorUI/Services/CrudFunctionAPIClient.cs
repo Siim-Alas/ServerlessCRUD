@@ -26,7 +26,7 @@ namespace ServerlessCrudBlazorUI.Services
             try
             {
                 return await _client.PostAsJsonAsync(
-                    "InsertOrMergeBlogPostEntity?code=daYVnhnXf3c4fNZJF3DLbRinnLuI8aAxpw9t2gfb7aVasuCFq6I4RQ==",
+                    "InsertOrMergeBlogPostEntity",
                     blogPost);
             }
             catch
@@ -42,7 +42,7 @@ namespace ServerlessCrudBlazorUI.Services
                 Console.WriteLine(_client.DefaultRequestHeaders.Authorization);
                 return JsonConvert.DeserializeObject<ListBlogPostEntitiesRequest>(
                     await (await _client.PostAsJsonAsync(
-                           "ListBlogPostEntities?code=H90/2vxRzA/kzfaqzhhd9yUCYdFDVJMj//6UedXW8rCgbBX1C6oUSQ==",
+                           "ListBlogPostEntities",
                            request
                            )).Content.ReadAsStringAsync()
                     );
@@ -60,7 +60,7 @@ namespace ServerlessCrudBlazorUI.Services
             {
                 return JsonConvert.DeserializeObject<BlogPostEntity>(
                     await (await _client.GetAsync(
-                        $"ReadBlogPostEntity?partitionkey={partitionKey}&rowkey={rowKey}&code=Dl1wYTdW8GT/DpFhCqK5n2qawDEzg2/teLB3pF4mpZWQNcj6vgsyHA=="
+                        $"ReadBlogPostEntity?partitionkey={partitionKey}&rowkey={rowKey}"
                         )).Content.ReadAsStringAsync()
                     );
             }
@@ -75,7 +75,7 @@ namespace ServerlessCrudBlazorUI.Services
             try
             {
                 return await _client.PostAsJsonAsync(
-                    "DeleteBlogPostEntity?code=gnZTJP8y3gxQdpJx6YyTbngYZd3t8ERP5Uy1/iyBW4EOPcigzgpHVQ==",
+                    "DeleteBlogPostEntity",
                     blogPost);
             }
             catch

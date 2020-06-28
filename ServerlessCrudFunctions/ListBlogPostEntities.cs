@@ -19,17 +19,18 @@ namespace ServerlessCrudFunctions
     {
         [FunctionName("ListBlogPostEntities")]
         public static async Task<IActionResult> Run(
-            [HttpTrigger(AuthorizationLevel.Function, "post", Route = null)] HttpRequest req,
+            [HttpTrigger(AuthorizationLevel.Anonymous, "post", Route = null)] HttpRequest req,
             [Table("blogposts", "AzureWebJobsStorage")] CloudTable table,
-            ClaimsPrincipal principal,
             ILogger log)
         {
             log.LogInformation("function ListBlogPostEntities -- started processing request.");
 
             try
             {
-                log.LogInformation(string.Join("; ", principal.Claims));
-                log.LogInformation(string.Join(" || ", req.Headers.GetCommaSeparatedValues(" -> ")));
+                log.LogInformation($"Authorization: {req.Headers["Authorization"]}");
+                log.LogInformation($"X-MS-TOKEN-AAD-ID-TOKEN: {req.Headers["X-MS-TOKEN-AAD-ID-TOKEN"]}");
+                log.LogInformation($"X-MS-TOKEN-AAD-ACCESS-TOKEN: {req.Headers["X-MS-TOKEN-AAD-ACCESS-TOKEN"]}");
+
 
                 ListBlogPostEntitiesRequest request = JsonConvert.DeserializeObject<ListBlogPostEntitiesRequest>(
                     await req.ReadAsStringAsync()
