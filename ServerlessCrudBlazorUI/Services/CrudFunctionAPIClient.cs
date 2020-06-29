@@ -14,18 +14,20 @@ namespace ServerlessCrudBlazorUI.Services
 {
     public class CrudFunctionAPIClient
     {
-        private readonly HttpClient _client;
+        private readonly HttpClient _secureClient;
+        private readonly HttpClient _annonymousClient;
 
         public CrudFunctionAPIClient(IHttpClientFactory factory)
         {
-            _client = factory.CreateClient("CrudAPI");
+            _secureClient = factory.CreateClient("CrudAPI_Secure");
+            _annonymousClient = factory.CreateClient("CrudAPI_Annonymous");
         }
 
         public async Task<HttpResponseMessage> PostBlogPostAsync(BlogPostEntity blogPost)
         {
             try
             {
-                return await _client.PostAsJsonAsync(
+                return await _secureClient.PostAsJsonAsync(
                     "InsertOrMergeBlogPostEntity",
                     blogPost);
             }
@@ -39,9 +41,8 @@ namespace ServerlessCrudBlazorUI.Services
         {
             try
             {
-                Console.WriteLine(_client.DefaultRequestHeaders.Authorization);
                 return JsonConvert.DeserializeObject<ListBlogPostEntitiesRequest>(
-                    await (await _client.PostAsJsonAsync(
+                    await (await _annonymousClient.PostAsJsonAsync(
                            "ListBlogPostEntities",
                            request
                            )).Content.ReadAsStringAsync()
@@ -59,7 +60,7 @@ namespace ServerlessCrudBlazorUI.Services
             try
             {
                 return JsonConvert.DeserializeObject<BlogPostEntity>(
-                    await (await _client.GetAsync(
+                    await (await _annonymousClient.GetAsync(
                         $"ReadBlogPostEntity?partitionkey={partitionKey}&rowkey={rowKey}"
                         )).Content.ReadAsStringAsync()
                     );
@@ -74,7 +75,7 @@ namespace ServerlessCrudBlazorUI.Services
         {
             try
             {
-                return await _client.PostAsJsonAsync(
+                return await _secureClient.PostAsJsonAsync(
                     "DeleteBlogPostEntity",
                     blogPost);
             }

@@ -22,9 +22,14 @@ namespace ServerlessCrudBlazorUI
             builder.Services.AddTransient<CustomAuthorizationMessageHandler>();
 
             builder.Services.AddHttpClient(
-                "CrudAPI", 
+                "CrudAPI_Secure", 
                 client => client.BaseAddress = new Uri("https://serverlesscrud.azurewebsites.net/api/")
             ).AddHttpMessageHandler<CustomAuthorizationMessageHandler>();
+
+            builder.Services.AddHttpClient(
+                "CrudAPI_Annonymous",
+                client => client.BaseAddress = new Uri("https://serverlesscrud.azurewebsites.net/api/")
+            );
 
             builder.Services.AddTransient<CrudFunctionAPIClient>();
 

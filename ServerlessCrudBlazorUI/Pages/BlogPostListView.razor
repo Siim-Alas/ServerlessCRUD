@@ -3,6 +3,7 @@
 @using ServerlessCrudClassLibrary
 @using Services
 @inject CrudFunctionAPIClient crudClient
+@inject AuthenticationStateProvider authStateProvider
 
 <h3>BlogPostListView</h3>
 
@@ -11,16 +12,23 @@
     <div class="card">
         <div class="card-header">
             <h4>
-                <a href="@($"/detail/{post.PartitionKey}/{post.RowKey}")">@post.Title</a>
+                @if (post.Author == userName)
+                {
+                    <a href="@($"/detail/{post.PartitionKey}/{post.RowKey}")">@post.Title</a>
+                }
+                else
+                {
+                    @post.Title
+                }
             </h4>
             <p>
                 <small>By @post.Author -- Last Updated @post.Timestamp.ToLocalTime()</small>
             </p>
         </div>
         <div class="card-body">
-           <p class="card-text">
-               @post.Text
-           </p>
+            <p class="card-text">
+                @post.Text
+            </p>
         </div>
     </div>
 }
@@ -29,6 +37,7 @@
 
 @code {
     private ListBlogPostEntitiesRequest request { get; set; } = new ListBlogPostEntitiesRequest();
+    private string userName { get; set; }
 
     private async Task UpdatePosts()
     {
@@ -38,6 +47,7 @@
     protected override async Task OnInitializedAsync()
     {
         await base.OnInitializedAsync();
+        userName = (await authStateProvider.GetAuthenticationStateAsync()).User.Identity.Name;
         await UpdatePosts();
     }
 }
