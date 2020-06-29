@@ -12,13 +12,23 @@ using System.Collections.Generic;
 using Microsoft.Azure.Cosmos.Table;
 using System.Web.Http;
 using System.Security.Claims;
+using System.Runtime.CompilerServices;
+using System.IdentityModel.Tokens.Jwt;
+using ServerlessCrudFunctions.Services;
 
 namespace ServerlessCrudFunctions
 {
-    public static class ListBlogPostEntities
+    public class ListBlogPostEntities
     {
+        private readonly JwtService _jwtService;
+
+        public ListBlogPostEntities(JwtService service)
+        {
+            _jwtService = service;
+        }
+
         [FunctionName("ListBlogPostEntities")]
-        public static async Task<IActionResult> Run(
+        public async Task<IActionResult> Run(
             [HttpTrigger(AuthorizationLevel.Anonymous, "post", Route = null)] HttpRequest req,
             [Table("blogposts", "AzureWebJobsStorage")] CloudTable table,
             ILogger log)
@@ -27,10 +37,10 @@ namespace ServerlessCrudFunctions
 
             try
             {
-                log.LogInformation($"Authorization: {req.Headers["Authorization"]}");
-                log.LogInformation($"X-MS-TOKEN-AAD-ID-TOKEN: {req.Headers["X-MS-TOKEN-AAD-ID-TOKEN"]}");
-                log.LogInformation($"X-MS-TOKEN-AAD-ACCESS-TOKEN: {req.Headers["X-MS-TOKEN-AAD-ACCESS-TOKEN"]}");
+                ClaimsPrincipal principal = await _jwtService.GetClaimsPrincipalAsync(req);
 
+                log.LogInformation(principal.Identity.Name);
+                log.LogInformation(string.Join("\n\n", principal.Claims));
 
                 ListBlogPostEntitiesRequest request = JsonConvert.DeserializeObject<ListBlogPostEntitiesRequest>(
                     await req.ReadAsStringAsync()
