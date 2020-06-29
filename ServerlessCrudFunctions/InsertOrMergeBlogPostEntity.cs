@@ -11,36 +11,45 @@ using Microsoft.Azure.Cosmos.Table;
 using ServerlessCrudClassLibrary;
 using System.Web.Http;
 using System.ComponentModel;
+using ServerlessCrudFunctions.Services;
+using System.Security.Claims;
+using System.Linq;
 
 namespace ServerlessCrudFunctions
 {
-    public static class InsertOrMergeBlogPostEntity
+    public class InsertOrMergeBlogPostEntity
     {
+        private readonly JwtService _jwtService;
+
+        public InsertOrMergeBlogPostEntity(JwtService service)
+        {
+            _jwtService = service;
+        }
+
         [FunctionName("InsertOrMergeBlogPostEntity")]
-        public static async Task<IActionResult> Run(
+        public async Task<IActionResult> Run(
             [HttpTrigger(AuthorizationLevel.Anonymous, "post", Route = null)] HttpRequest req,
             [Table("blogposts", "AzureWebJobsStorage")] CloudTable table,
             ILogger log)
         {
-            log.LogInformation("function InsertOrMergeBlogPostEntity -- started processing request.");
-
             try
             {
-                await table.CreateIfNotExistsAsync();
-
                 BlogPostEntity blogPost = JsonConvert.DeserializeObject<BlogPostEntity>(
                     await req.ReadAsStringAsync()
                     );
 
                 if (!blogPost.IsValid)
                 {
-                    throw new FormatException("The BlogPostEntity.Isvalid check failed.");
+                    return new BadRequestErrorMessageResult("The BlogPost.IsValid check failed.");
+                }
+                else if (blogPost.Author != (await _jwtService.GetClaimsPrincipalAsync(req))
+                    .Claims.Where(claim => claim.Type == "name").First().Value)
+                {
+                    return new UnauthorizedResult();
                 }
 
                 TableOperation insertOrMergeOperation = TableOperation.InsertOrMerge(blogPost);
                 TableResult result = await table.ExecuteAsync(insertOrMergeOperation);
-
-                log.LogInformation($"function InsertOrMergeBlogPostEntity -- got response '{result.HttpStatusCode}' from table '{table.Name}'");
 
                 return new OkResult();
             }

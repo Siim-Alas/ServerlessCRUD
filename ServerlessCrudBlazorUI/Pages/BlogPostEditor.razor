@@ -13,6 +13,9 @@
 <h3>BlogPostEditor</h3>
 
 <EditForm Model="blogPost" OnValidSubmit="OnValidSubmit">
+    <DataAnnotationsValidator />
+    <ValidationSummary />
+
     @if (blogPostAlreadyExists)
     {
         <h4>@blogPost.Title</h4>
@@ -36,7 +39,7 @@
 }
 
 @code {
-    private BlogPostEntity blogPost { get; set; } = new BlogPostEntity("title", "author", "text");
+    private BlogPostEntity blogPost { get; set; } = new BlogPostEntity("title", "author", "...");
     private BlogPostEntity backup { get; set; }
     private bool blogPostAlreadyExists { get; set; } = false;
 
@@ -44,7 +47,6 @@
     {
         if (blogPost.IsValid)
         {
-            blogPost.Author = (await authStateProvider.GetAuthenticationStateAsync()).User.Identity.Name;
             await JsRuntime.InvokeVoidAsync(
                 "alert",
                 ((await crudClient.PostBlogPostAsync(blogPost)).StatusCode == System.Net.HttpStatusCode.OK) ?
@@ -87,8 +89,12 @@
         {
             blogPostAlreadyExists = true;
             blogPost = await crudClient.GetBlogPostEntityAsync(pk, rk);
-        }
 
-        backup = blogPost.Clone();
+            backup = blogPost.Clone();
+        }
+        else
+        {
+            blogPost.Author = (await authStateProvider.GetAuthenticationStateAsync()).User.Identity.Name;
+        }
     }
 }

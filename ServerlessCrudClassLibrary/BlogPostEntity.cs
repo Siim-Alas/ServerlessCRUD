@@ -20,7 +20,7 @@ namespace ServerlessCrudClassLibrary
         /// <param name="text">The text of the post.</param>
         public BlogPostEntity(string title, string author, string text = "")
         {
-            PartitionKey = DateTime.UtcNow.ToString("yyyy_MM");
+            PartitionKey = $"{9999 - DateTime.UtcNow.Year}{99 - DateTime.UtcNow.Month}";
             SetRowKey(title, author);
             Text = text;
         }
@@ -37,7 +37,8 @@ namespace ServerlessCrudClassLibrary
         [JsonIgnore]
         public string Title 
         { 
-            get { return RowKey.Substring(RowKey.IndexOf('_') + 1, RowKey.LastIndexOf('_') - RowKey.IndexOf('_') - 1); } 
+            // There are 19 digits and 1 underscore, the (0-based) title starts at 20
+            get { return RowKey.Substring(20, RowKey.LastIndexOf('_') - 20); } 
             set { SetRowKey(value, Author); }
         }
         /// <summary>
@@ -61,7 +62,7 @@ namespace ServerlessCrudClassLibrary
             get 
             {
                 return 
-                    Regex.IsMatch(PartitionKey, @"^[0-9]{4}_[0-9]{2}$") && 
+                    Regex.IsMatch(PartitionKey, @"^[0-9]{6}$") && 
                     Regex.IsMatch(RowKey, @"^[0-9]{19}_.+_.+$") && 
                     Timestamp != null &&
                     Text != null;
@@ -75,7 +76,7 @@ namespace ServerlessCrudClassLibrary
         private void SetRowKey(string title, string author)
         {
             RowKey = string.Format("{0}_{1}_{2}",
-                    (DateTime.MaxValue.Ticks - DateTime.UtcNow.Ticks).ToString("d19"),
+                    RowKey?.Substring(0, 19) ?? (DateTime.MaxValue.Ticks - DateTime.UtcNow.Ticks).ToString("d19"),
                     title,
                     author);
         }

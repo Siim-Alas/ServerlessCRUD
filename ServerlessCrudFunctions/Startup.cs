@@ -17,9 +17,7 @@ namespace ServerlessCrudFunctions
     {
         public override void Configure(IFunctionsHostBuilder builder)
         {
-            builder.Services.AddScoped(options => {
-                return new JwtService();
-            });
+            builder.Services.AddScoped<JwtService>();
         }
     }
 }

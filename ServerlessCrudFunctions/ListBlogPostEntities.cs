@@ -20,11 +20,9 @@ namespace ServerlessCrudFunctions
 {
     public class ListBlogPostEntities
     {
-        private readonly JwtService _jwtService;
-
-        public ListBlogPostEntities(JwtService service)
+        public ListBlogPostEntities()
         {
-            _jwtService = service;
+            
         }
 
         [FunctionName("ListBlogPostEntities")]
@@ -33,15 +31,8 @@ namespace ServerlessCrudFunctions
             [Table("blogposts", "AzureWebJobsStorage")] CloudTable table,
             ILogger log)
         {
-            log.LogInformation("function ListBlogPostEntities -- started processing request.");
-
             try
             {
-                ClaimsPrincipal principal = await _jwtService.GetClaimsPrincipalAsync(req);
-
-                log.LogInformation(principal.Identity.Name);
-                log.LogInformation(string.Join("\n\n", principal.Claims));
-
                 ListBlogPostEntitiesRequest request = JsonConvert.DeserializeObject<ListBlogPostEntitiesRequest>(
                     await req.ReadAsStringAsync()
                     );
@@ -52,8 +43,6 @@ namespace ServerlessCrudFunctions
 
                 request.BlogPosts = result.Results;
                 request.ContinuationToken = result.ContinuationToken;
-
-                log.LogInformation($"function ListBlogPostEntities -- got response with '{result.Results.Count}' entities from table '{table.Name}'.");
 
                 return new OkObjectResult(request);
             }

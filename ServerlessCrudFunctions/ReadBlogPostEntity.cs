@@ -13,10 +13,15 @@ using ServerlessCrudClassLibrary;
 
 namespace ServerlessCrudFunctions
 {
-    public static class ReadBlogPostEntity
+    public class ReadBlogPostEntity
     {
+        public ReadBlogPostEntity()
+        {
+
+        }
+
         [FunctionName("ReadBlogPostEntity")]
-        public static async Task<IActionResult> Run(
+        public async Task<IActionResult> Run(
             [HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = null)] HttpRequest req,
             [Table("blogposts", "AzureWebJobsStorage")] CloudTable table,
             ILogger log)
@@ -25,8 +30,6 @@ namespace ServerlessCrudFunctions
 
             try
             {
-                await table.CreateIfNotExistsAsync();
-
                 TableResult result = await table.ExecuteAsync(TableOperation.Retrieve<BlogPostEntity>(
                     req.Query["partitionkey"], 
                     req.Query["rowkey"]));
