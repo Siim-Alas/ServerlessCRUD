@@ -4,8 +4,8 @@
 @using Microsoft.AspNetCore.WebUtilities
 @using Microsoft.Extensions.Primitives
 @using ServerlessCrudClassLibrary
-@using Services
-@inject CrudFunctionAPIClient crudClient
+@using ServerlessCrudBlazorUI.Services.Interfaces
+@inject ISecureCrudFunctionAPIClient crudClient
 @inject NavigationManager navigationManager
 @inject IJSRuntime JsRuntime
 @inject AuthenticationStateProvider authStateProvider

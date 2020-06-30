@@ -9,6 +9,8 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using ServerlessCrudBlazorUI.Services;
 using Microsoft.AspNetCore.Components.Authorization;
+using System.Diagnostics.CodeAnalysis;
+using ServerlessCrudBlazorUI.Services.Interfaces;
 
 namespace ServerlessCrudBlazorUI
 {
@@ -21,17 +23,11 @@ namespace ServerlessCrudBlazorUI
 
             builder.Services.AddTransient<CustomAuthorizationMessageHandler>();
 
-            builder.Services.AddHttpClient(
-                "CrudAPI_Secure", 
-                client => client.BaseAddress = new Uri("https://serverlesscrud.azurewebsites.net/api/")
-            ).AddHttpMessageHandler<CustomAuthorizationMessageHandler>();
+            builder.Services.AddHttpClient<IAnnonymousCrudFunctionAPIClient, AnnonymousCrudFunctionAPIClient>();
+            builder.Services.AddHttpClient<ISecureCrudFunctionAPIClient, SecureCrudFunctionAPIClient>()
+                .AddHttpMessageHandler<CustomAuthorizationMessageHandler>();
 
-            builder.Services.AddHttpClient(
-                "CrudAPI_Annonymous",
-                client => client.BaseAddress = new Uri("https://serverlesscrud.azurewebsites.net/api/")
-            );
-
-            builder.Services.AddTransient<CrudFunctionAPIClient>();
+            builder.Services.AddTransient<SecureCrudFunctionAPIClient>();
 
             builder.Services.AddMsalAuthentication(options =>
             {

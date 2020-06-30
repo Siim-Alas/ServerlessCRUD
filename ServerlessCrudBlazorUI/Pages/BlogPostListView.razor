@@ -1,8 +1,8 @@
 ﻿@page "/blogposts"
 
 @using ServerlessCrudClassLibrary
-@using Services
-@inject CrudFunctionAPIClient crudClient
+@using ServerlessCrudBlazorUI.Services.Interfaces
+@inject IAnnonymousCrudFunctionAPIClient crudClient
 @inject AuthenticationStateProvider authStateProvider
 
 <h3>BlogPostListView</h3>
