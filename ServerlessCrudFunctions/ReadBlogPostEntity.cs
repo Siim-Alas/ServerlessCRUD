@@ -36,11 +36,11 @@ namespace ServerlessCrudFunctions
 
                 log.LogInformation($"function ReadBlogPostEntity -- got response '{result.HttpStatusCode}' from table '{table.Name}'.");
 
-                return new OkObjectResult(JsonConvert.SerializeObject((BlogPostEntity)result.Result));
+                return new OkObjectResult(result.Result);
             }
             catch (Exception e)
             {
-                log.LogInformation($"function ReadBlogPostEntity -- caught exception {e} {e.Message} {e.StackTrace}");
+                log.LogError($"function ReadBlogPostEntity -- caught exception {e} {e.Message} {e.StackTrace}");
                 return new InternalServerErrorResult();
             }
         }

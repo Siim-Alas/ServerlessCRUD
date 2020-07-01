@@ -1,5 +1,4 @@
 ﻿using Newtonsoft.Json;
-using ServerlessCrudBlazorUI.Services.Interfaces;
 using ServerlessCrudClassLibrary;
 using System;
 using System.Collections.Generic;
@@ -10,11 +9,11 @@ using System.Threading.Tasks;
 
 namespace ServerlessCrudBlazorUI.Services
 {
-    public class AnnonymousCrudFunctionAPIClient : IAnnonymousCrudFunctionAPIClient
+    public class UnauthorizedCrudFunctionAPIClient
     {
-        protected readonly HttpClient _client;
+        private readonly HttpClient _client;
 
-        public AnnonymousCrudFunctionAPIClient(HttpClient client)
+        public UnauthorizedCrudFunctionAPIClient(HttpClient client)
         {
             _client = client;
             _client.BaseAddress = new Uri("https://serverlesscrud.azurewebsites.net/api/");
@@ -51,6 +50,22 @@ namespace ServerlessCrudBlazorUI.Services
             catch
             {
                 return new BlogPostEntity("Error", "Blazor Bot", "Something has gone wrong processing your request.");
+            }
+        }
+
+        public async Task<TableMetadata> GetTableMetadataAsync()
+        {
+            try
+            {
+                return JsonConvert.DeserializeObject<TableMetadata>(
+                    await (await _client.GetAsync(
+                        "GetBlogPostsTableMetadata"
+                        )).Content.ReadAsStringAsync()
+                    );
+            }
+            catch
+            {
+                return new TableMetadata(0);
             }
         }
     }

@@ -4,8 +4,9 @@
 @using Microsoft.AspNetCore.WebUtilities
 @using Microsoft.Extensions.Primitives
 @using ServerlessCrudClassLibrary
-@using ServerlessCrudBlazorUI.Services.Interfaces
-@inject ISecureCrudFunctionAPIClient crudClient
+@using ServerlessCrudBlazorUI.Services
+@inject AuthorizedCrudFunctionAPIClient authorizedClient
+@inject UnauthorizedCrudFunctionAPIClient unauthorizedClient
 @inject NavigationManager navigationManager
 @inject IJSRuntime JsRuntime
 @inject AuthenticationStateProvider authStateProvider
@@ -49,7 +50,7 @@
         {
             await JsRuntime.InvokeVoidAsync(
                 "alert",
-                ((await crudClient.PostBlogPostAsync(blogPost)).StatusCode == System.Net.HttpStatusCode.OK) ?
+                ((await authorizedClient.PostBlogPostAsync(blogPost)).StatusCode == System.Net.HttpStatusCode.OK) ?
                 "Your blog post has been saved." : "Something went wrong.");
 
             navigationManager.NavigateTo("/blogposts");
@@ -71,7 +72,7 @@
         {
             await JsRuntime.InvokeVoidAsync(
                 "alert",
-                ((await crudClient.PostDeleteBlogPostEntityAsync(backup)).StatusCode == System.Net.HttpStatusCode.OK) ?
+                ((await authorizedClient.PostDeleteBlogPostEntityAsync(backup)).StatusCode == System.Net.HttpStatusCode.OK) ?
                 "Your blog post has been deleted." : "Something went wrong.");
 
             navigationManager.NavigateTo("/blogposts");
@@ -88,7 +89,7 @@
             (QueryHelpers.ParseQuery(uri.Query).TryGetValue("rowkey", out StringValues rk)))
         {
             blogPostAlreadyExists = true;
-            blogPost = await crudClient.GetBlogPostEntityAsync(pk, rk);
+            blogPost = await unauthorizedClient.GetBlogPostEntityAsync(pk, rk);
 
             backup = blogPost.Clone();
         }

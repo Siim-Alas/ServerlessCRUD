@@ -2,8 +2,8 @@
 
 @using Microsoft.AspNetCore.WebUtilities
 @using ServerlessCrudClassLibrary
-@using ServerlessCrudBlazorUI.Services.Interfaces
-@inject IAnnonymousCrudFunctionAPIClient crudClient
+@using ServerlessCrudBlazorUI.Services
+@inject UnauthorizedCrudFunctionAPIClient client
 @inject NavigationManager navigationManager
 
 <h3>BlogPostDetailView</h3>
@@ -22,7 +22,7 @@
     </p>
 </div>
 <div>
-    <a href="@($"/editor?partitionkey={PartitionKey}&rowkey={RowKey}")">Edit</a>
+    <NavLink href="@($"/editor?partitionkey={PartitionKey}&rowkey={RowKey}")">Edit</NavLink>
 </div>
 
 @code {
@@ -37,6 +37,6 @@
     {
         await base.OnInitializedAsync();
 
-        blogPost = await crudClient.GetBlogPostEntityAsync(PartitionKey, RowKey);
+        blogPost = await client.GetBlogPostEntityAsync(PartitionKey, RowKey);
     }
 }

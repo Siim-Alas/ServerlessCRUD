@@ -37,7 +37,7 @@ namespace ServerlessCrudFunctions
                     await req.ReadAsStringAsync()
                     );
 
-                var result = await table.ExecuteQuerySegmentedAsync(
+                TableQuerySegment<BlogPostEntity> result = await table.ExecuteQuerySegmentedAsync(
                     new TableQuery<BlogPostEntity>() { TakeCount = request.TakeCount },
                     request.ContinuationToken);
 
@@ -48,7 +48,7 @@ namespace ServerlessCrudFunctions
             }
             catch (Exception e)
             {
-                log.LogInformation($"function ListBlogPostEntities -- caught exception {e} {e.Message} {e.StackTrace}");
+                log.LogError($"function ListBlogPostEntities -- caught exception {e} {e.Message} {e.StackTrace}");
                 return new InternalServerErrorResult();
             }
         }

@@ -1,53 +1,118 @@
 ﻿@page "/blogposts"
 
 @using ServerlessCrudClassLibrary
-@using ServerlessCrudBlazorUI.Services.Interfaces
-@inject IAnnonymousCrudFunctionAPIClient crudClient
+@using ServerlessCrudBlazorUI.Services
+@inject UnauthorizedCrudFunctionAPIClient client
 @inject AuthenticationStateProvider authStateProvider
 
 <h3>BlogPostListView</h3>
 
-@foreach (BlogPostEntity post in request.BlogPosts)
+@if (hasInitialized)
 {
-    <div class="card">
-        <div class="card-header">
-            <h4>
-                @if (post.Author == userName)
-                {
-                    <a href="@($"/detail/{post.PartitionKey}/{post.RowKey}")">@post.Title</a>
-                }
-                else
-                {
-                    @post.Title
-                }
-            </h4>
-            <p>
-                <small>By @post.Author -- Last Updated @post.Timestamp.ToLocalTime()</small>
-            </p>
+    @foreach (BlogPostEntity post in blogPosts[index])
+    {
+        <div class="card">
+            <div class="card-header">
+                <h4>
+                    @if (post.Author == userName)
+                    {
+                        <NavLink href="@($"/detail/{post.PartitionKey}/{post.RowKey}")">@post.Title</NavLink>
+                    }
+                    else
+                    {
+                        @post.Title
+                    }
+                </h4>
+                <p>
+                    <small>By @post.Author -- Last Updated @post.Timestamp.ToLocalTime()</small>
+                </p>
+            </div>
+            <div class="card-body">
+                <p class="card-text">
+                    @post.Text
+                </p>
+            </div>
         </div>
-        <div class="card-body">
-            <p class="card-text">
-                @post.Text
-            </p>
-        </div>
-    </div>
+    }
+
+    <ul class="pagination justify-content-center">
+        <li class="page-item @((index == 0) ? "disabled" : "")">
+            <button class="page-link" type="button" @onclick="Previous">Previous</button>
+        </li>
+
+        @for (int i = 1; i <= numOfPages; i++)
+        {
+            <li class="page-item @((i - 1 == index) ? "active" : "")">
+                <button class="page-link" type="button">@i</button>
+            </li>
+        }
+
+        <li class="page-item @((index + 1 < numOfPages) ? "" : "disabled")">
+            <button class="page-link" type="button" @onclick="Next">Next</button>
+        </li>
+    </ul>
 }
 
-<button type="button" @onclick="UpdatePosts">Update</button>
-
 @code {
-    private ListBlogPostEntitiesRequest request { get; set; } = new ListBlogPostEntitiesRequest();
+    private bool hasInitialized = false;
+    private readonly static int numberOfEntitiesOnPage = 4;
+
+    private int index { get; set; } = 0;
+    private ListBlogPostEntitiesRequest request { get; set; } = new ListBlogPostEntitiesRequest(numberOfEntitiesOnPage);
+    private List<List<BlogPostEntity>> blogPosts { get; set; }
+    private TableMetadata metadata { get; set; }
     private string userName { get; set; }
 
-    private async Task UpdatePosts()
+    private int numOfPages { get { return (int)Math.Ceiling((decimal)(metadata.NumberOfEntities) / (decimal)numberOfEntitiesOnPage); } }
+
+    private async Task GetNewPosts()
     {
-        request = await crudClient.PostListBlogPostsRequestAsync(request);
+        request = await client.PostListBlogPostsRequestAsync(request);
+    }
+
+    private async Task GoToIndex(int i)
+    {
+        while (index > i)
+        {
+            Previous();
+        }
+
+        while (index < i)
+        {
+            await Next();
+        }
+    }
+
+    private void Previous()
+    {
+        if (--index < 0)
+        {
+            index = 0;
+        }
+    }
+
+    private async Task Next()
+    {
+        if (index + 1 < numOfPages)
+        {
+            await GetNewPosts();
+            blogPosts.Add(request.BlogPosts);
+            index++;
+        }
     }
 
     protected override async Task OnInitializedAsync()
     {
         await base.OnInitializedAsync();
         userName = (await authStateProvider.GetAuthenticationStateAsync()).User.Identity.Name;
-        await UpdatePosts();
+
+        await GetNewPosts();
+        metadata = await client.GetTableMetadataAsync();
+        blogPosts = new List<List<BlogPostEntity>>(numOfPages)
+        {
+            request.BlogPosts
+        };
+
+        hasInitialized = true;
     }
 }

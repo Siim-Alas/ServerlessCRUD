@@ -54,7 +54,7 @@ namespace ServerlessCrudFunctions
             }
             catch (Exception e)
             {
-                log.LogInformation($"function DeleteBlogPostEntity -- caught exception {e} {e.Message} {e.StackTrace}");
+                log.LogError($"function DeleteBlogPostEntity -- caught exception {e} {e.Message} {e.StackTrace}");
                 return new InternalServerErrorResult();
             }
         }

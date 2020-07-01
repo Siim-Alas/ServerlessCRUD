@@ -1,16 +1,12 @@
-using System;
 using System.Net.Http;
-using System.Collections.Generic;
 using System.Threading.Tasks;
-using System.Text;
+using Microsoft.AspNetCore.Components;
+using Microsoft.AspNetCore.Components.WebAssembly.Authentication;
 using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Http;
 using ServerlessCrudBlazorUI.Services;
-using Microsoft.AspNetCore.Components.Authorization;
-using System.Diagnostics.CodeAnalysis;
-using ServerlessCrudBlazorUI.Services.Interfaces;
 
 namespace ServerlessCrudBlazorUI
 {
@@ -23,11 +19,9 @@ namespace ServerlessCrudBlazorUI
 
             builder.Services.AddTransient<CustomAuthorizationMessageHandler>();
 
-            builder.Services.AddHttpClient<IAnnonymousCrudFunctionAPIClient, AnnonymousCrudFunctionAPIClient>();
-            builder.Services.AddHttpClient<ISecureCrudFunctionAPIClient, SecureCrudFunctionAPIClient>()
+            builder.Services.AddHttpClient<AuthorizedCrudFunctionAPIClient>()
                 .AddHttpMessageHandler<CustomAuthorizationMessageHandler>();
-
-            builder.Services.AddTransient<SecureCrudFunctionAPIClient>();
+            builder.Services.AddHttpClient<UnauthorizedCrudFunctionAPIClient>();
 
             builder.Services.AddMsalAuthentication(options =>
             {

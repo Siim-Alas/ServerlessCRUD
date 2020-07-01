@@ -1,23 +1,22 @@
-﻿using Microsoft.AspNetCore.Components.Authorization;
-using Microsoft.JSInterop;
-using Newtonsoft.Json;
-using ServerlessCrudBlazorUI.Services.Interfaces;
+﻿using Newtonsoft.Json;
 using ServerlessCrudClassLibrary;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http;
-using System.Net.Http.Headers;
 using System.Net.Http.Json;
 using System.Threading.Tasks;
 
 namespace ServerlessCrudBlazorUI.Services
 {
-    public class SecureCrudFunctionAPIClient : AnnonymousCrudFunctionAPIClient, ISecureCrudFunctionAPIClient
+    public class AuthorizedCrudFunctionAPIClient
     {
-        public SecureCrudFunctionAPIClient(HttpClient client) : base(client)
+        private readonly HttpClient _client;
+
+        public AuthorizedCrudFunctionAPIClient(HttpClient client)
         {
-            
+            _client = client;
+            _client.BaseAddress = new Uri("https://serverlesscrud.azurewebsites.net/api/");
         }
 
         public async Task<HttpResponseMessage> PostBlogPostAsync(BlogPostEntity blogPost)
@@ -28,8 +27,9 @@ namespace ServerlessCrudBlazorUI.Services
                     "InsertOrMergeBlogPostEntity",
                     blogPost);
             }
-            catch
+            catch (Exception e)
             {
+                Console.WriteLine(e);
                 return new HttpResponseMessage(System.Net.HttpStatusCode.BadRequest);
             }
         }
