@@ -1,49 +1,35 @@
 ﻿@inject AuthenticationStateProvider authStateProvider
 
-<div class="top-row pl-4 navbar navbar-dark">
-    <a class="navbar-brand" href="">ServerlessCrudBlazorUI</a>
-    <button class="navbar-toggler" @onclick="ToggleNavMenu">
-        <span class="navbar-toggler-icon"></span>
-    </button>
-</div>
-
-<div class="@NavMenuCssClass" @onclick="ToggleNavMenu">
-    <ul class="nav flex-column">
+<div class="pl-4 navbar navbar-dark">
+    <ul class="nav flex-row w-100">
         <li class="nav-item px-3">
-            <NavLink class="nav-link" href="" Match="NavLinkMatch.All">
-                <span class="oi oi-home" aria-hidden="true"></span> Home
+            <NavLink class="nav-link navbar-brand" href="" Match="NavLinkMatch.All">
+                <span class="oi oi-home" aria-hidden="true"></span> <span class="hide-on-small-screen">Home</span>
             </NavLink>
         </li>
         @if (userIsAuthenticated)
         {
             <li class="nav-item px-3">
                 <NavLink class="nav-link" href="editor">
-                    <span class="oi oi-plus" aria-hidden="true"></span> New Blog Post
+                    <span class="oi oi-pencil" aria-hidden="true"></span> <span class="hide-on-small-screen">New Blog Post</span>
                 </NavLink>
             </li>
         }
         <li class="nav-item px-3">
             <NavLink class="nav-link" href="blogposts">
-                <span class="oi oi-plus" aria-hidden="true"></span> Blog Posts
+                <span class="oi oi-book" aria-hidden="true"></span> <span class="hide-on-small-screen">Blog Posts</span>
             </NavLink>
         </li>
     </ul>
 </div>
 
 @code {
-    private bool collapseNavMenu = true;
-    private string NavMenuCssClass => collapseNavMenu ? "collapse" : null;
-
     private bool userIsAuthenticated = false;
-
-    private void ToggleNavMenu()
-    {
-        collapseNavMenu = !collapseNavMenu;
-    }
 
     private void OnAuthenticationStateChanged(Task<AuthenticationState> task)
     {
         userIsAuthenticated = task.Result.User.Identity.IsAuthenticated;
+        this.StateHasChanged();
     }
 
     protected override async Task OnInitializedAsync()

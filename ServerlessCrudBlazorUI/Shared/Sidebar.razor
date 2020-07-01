@@ -1,0 +1,38 @@
+﻿@using ServerlessCrudClassLibrary
+@using ServerlessCrudBlazorUI.Services
+@inject UnauthorizedCrudFunctionAPIClient client
+
+<div class="sidebar ml-4 p-4">
+    <h4>About you</h4>
+    <p>
+        Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vivamus volutpat mi id nibh rhoncus consectetur.
+        Nulla eu semper neque. Donec at ipsum quis libero semper sagittis. Cras dolor diam, accumsan quis orci ac,
+        pellentesque porta neque. In ac dictum leo.
+    </p>
+
+    <h4>Latest Posts</h4>
+    <ul>
+        @foreach (BlogPostEntity post in request.BlogPosts)
+        {
+            <li>
+                <h4>
+                    <NavLink href="@($"/detail/{post.PartitionKey}/{post.RowKey}")">@post.Title</NavLink>
+                </h4>
+                <p>
+                    <small>By @post.Author -- Last Updated @post.Timestamp.ToLocalTime()</small>
+                </p>
+            </li>
+        }
+    </ul>
+</div>
+
+@code {
+    private ListBlogPostEntitiesRequest request { get; set; } = new ListBlogPostEntitiesRequest(4);
+
+    protected override async Task OnInitializedAsync()
+    {
+        await base.OnInitializedAsync();
+
+        request = await client.PostListBlogPostsRequestAsync(request);
+    }
+}

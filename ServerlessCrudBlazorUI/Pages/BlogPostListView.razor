@@ -3,7 +3,6 @@
 @using ServerlessCrudClassLibrary
 @using ServerlessCrudBlazorUI.Services
 @inject UnauthorizedCrudFunctionAPIClient client
-@inject AuthenticationStateProvider authStateProvider
 
 <h3>BlogPostListView</h3>
 
@@ -14,14 +13,7 @@
         <div class="card">
             <div class="card-header">
                 <h4>
-                    @if (post.Author == userName)
-                    {
-                        <NavLink href="@($"/detail/{post.PartitionKey}/{post.RowKey}")">@post.Title</NavLink>
-                    }
-                    else
-                    {
-                        @post.Title
-                    }
+                    <NavLink href="@($"/detail/{post.PartitionKey}/{post.RowKey}")">@post.Title</NavLink>
                 </h4>
                 <p>
                     <small>By @post.Author -- Last Updated @post.Timestamp.ToLocalTime()</small>
@@ -104,7 +96,6 @@
     protected override async Task OnInitializedAsync()
     {
         await base.OnInitializedAsync();
-        userName = (await authStateProvider.GetAuthenticationStateAsync()).User.Identity.Name;
 
         await GetNewPosts();
         metadata = await client.GetTableMetadataAsync();

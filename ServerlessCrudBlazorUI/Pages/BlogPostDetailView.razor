@@ -5,6 +5,7 @@
 @using ServerlessCrudBlazorUI.Services
 @inject UnauthorizedCrudFunctionAPIClient client
 @inject NavigationManager navigationManager
+@inject AuthenticationStateProvider authStateProvider
 
 <h3>BlogPostDetailView</h3>
 
@@ -21,9 +22,10 @@
         @blogPost.Text
     </p>
 </div>
-<div>
+@if (userName == blogPost.Author)
+{
     <NavLink href="@($"/editor?partitionkey={PartitionKey}&rowkey={RowKey}")">Edit</NavLink>
-</div>
+}
 
 @code {
     [Parameter]
@@ -31,6 +33,7 @@
     [Parameter]
     public string RowKey { get; set; }
 
+    private string userName;
     private BlogPostEntity blogPost { get; set; } = new BlogPostEntity("", "");
 
     protected override async Task OnInitializedAsync()
@@ -38,5 +41,6 @@
         await base.OnInitializedAsync();
 
         blogPost = await client.GetBlogPostEntityAsync(PartitionKey, RowKey);
+        userName = (await authStateProvider.GetAuthenticationStateAsync()).User.Identity.Name;
     }
 }
