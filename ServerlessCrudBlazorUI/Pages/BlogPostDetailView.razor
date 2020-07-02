@@ -1,6 +1,6 @@
-﻿@page "/detail/{partitionKey}/{rowKey}"
+﻿@page "/detail/{dateString}/{rowKey}"
 
-@using Microsoft.AspNetCore.WebUtilities
+@using ServerlessCrudClassLibrary.Utilities
 @using ServerlessCrudClassLibrary
 @using ServerlessCrudBlazorUI.Services
 @inject UnauthorizedCrudFunctionAPIClient client
@@ -24,12 +24,12 @@
 </div>
 @if (userName == blogPost.Author)
 {
-    <NavLink href="@($"/editor?partitionkey={PartitionKey}&rowkey={RowKey}")">Edit</NavLink>
+    <NavLink href="@($"/editor?partitionkey={PrettyPrinter.BlogPostPartitionKeyFromDateString(DateString)}&rowkey={RowKey}")">Edit</NavLink>
 }
 
 @code {
     [Parameter]
-    public string PartitionKey { get; set; }
+    public string DateString { get; set; }
     [Parameter]
     public string RowKey { get; set; }
 
@@ -40,7 +40,9 @@
     {
         await base.OnInitializedAsync();
 
-        blogPost = await client.GetBlogPostEntityAsync(PartitionKey, RowKey);
+        blogPost = await client.GetBlogPostEntityAsync(
+            PrettyPrinter.BlogPostPartitionKeyFromDateString(DateString), 
+            RowKey);
         userName = (await authStateProvider.GetAuthenticationStateAsync()).User.Identity.Name;
     }
 }

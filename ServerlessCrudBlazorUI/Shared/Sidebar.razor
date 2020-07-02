@@ -1,5 +1,6 @@
 ﻿@using ServerlessCrudClassLibrary
 @using ServerlessCrudBlazorUI.Services
+@using ServerlessCrudClassLibrary.Utilities
 @inject UnauthorizedCrudFunctionAPIClient client
 
 <div class="sidebar p-4">
@@ -16,7 +17,7 @@
         {
             <li>
                 <h4>
-                    <NavLink href="@($"/detail/{post.PartitionKey}/{post.RowKey}")">@post.Title</NavLink>
+                    <NavLink href="@($"/detail/{PrettyPrinter.DateStringFromBlogPostPartitionKey(post.PartitionKey)}/{post.RowKey}")">@post.Title</NavLink>
                 </h4>
                 <p>
                     <small>By @post.Author -- Last Updated @post.Timestamp.ToLocalTime()</small>
