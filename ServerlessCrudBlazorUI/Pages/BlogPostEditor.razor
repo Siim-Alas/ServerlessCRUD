@@ -11,7 +11,7 @@
 @inject IJSRuntime JsRuntime
 @inject AuthenticationStateProvider authStateProvider
 
-<h3>BlogPostEditor</h3>
+<h3>Blog Post Editor</h3>
 
 <EditForm Model="blogPost" OnValidSubmit="OnValidSubmit">
     <DataAnnotationsValidator />
@@ -19,18 +19,24 @@
 
     @if (blogPostAlreadyExists)
     {
-        <h4>@blogPost.Title</h4>
-        <p>By @blogPost.Author -- last edited on @blogPost.Timestamp.UtcDateTime.ToLocalTime()</p>
+        <div class="form-group">
+            <h4>@blogPost.Title</h4>
+            <p>By @blogPost.Author &mdash; Last updated: @blogPost.Timestamp.ToLocalTime().ToString("hh:mm d MMMM yyyy")</p>
+        </div>
     }
     else
     {
-        <label>Post Title</label>
-        <InputText @bind-Value="blogPost.Title"></InputText>
+        <div class="form-group">
+            <label for="title">Post Title</label>
+            <InputText id="title" class="form-control" @bind-Value="blogPost.Title"></InputText>
+        </div>
     }
-    <label>Text</label>
-    <InputTextArea @bind-Value="blogPost.Text"></InputTextArea>
+    <div class="form-group">
+        <label for="text">Text</label>
+        <InputTextArea id="text" class="form-control" rows="20" @bind-Value="blogPost.Text"></InputTextArea>
+    </div>
 
-    <button type="submit">Submit</button>
+    <button class="btn btn-dark" type="submit">Submit</button>
 </EditForm>
 
 @if (blogPostAlreadyExists)

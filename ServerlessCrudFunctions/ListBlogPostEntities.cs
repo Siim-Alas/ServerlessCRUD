@@ -37,6 +37,20 @@ namespace ServerlessCrudFunctions
                     await req.ReadAsStringAsync()
                     );
 
+                while (request.Skip > 0)
+                {
+                    TableQuerySegment<BlogPostEntity> r = await table.ExecuteQuerySegmentedAsync(
+                        new TableQuery<BlogPostEntity>() 
+                        { 
+                            TakeCount = request.Skip, 
+                            SelectColumns = new List<string>() { "PartitionKey" }
+                        }, 
+                        request.ContinuationToken
+                        );
+                    request.Skip -= r.Results.Count;
+                    request.ContinuationToken = r.ContinuationToken;
+                }
+
                 TableQuerySegment<BlogPostEntity> result = await table.ExecuteQuerySegmentedAsync(
                     new TableQuery<BlogPostEntity>() { TakeCount = request.TakeCount },
                     request.ContinuationToken);

@@ -3,24 +3,21 @@
 @using ServerlessCrudClassLibrary.Utilities
 @using ServerlessCrudClassLibrary
 @using ServerlessCrudBlazorUI.Services
+
 @inject UnauthorizedCrudFunctionAPIClient client
 @inject NavigationManager navigationManager
 @inject AuthenticationStateProvider authStateProvider
 
-<h3>BlogPostDetailView</h3>
-
 <div>
-    <h4>
+    <h3>
         @blogPost.Title
-    </h4>
+    </h3>
     <p>
-        <small>By @blogPost.Author -- Last Updated @blogPost.Timestamp.ToLocalTime()</small>
+        <small>By @blogPost.Author &mdash; Last updated: @blogPost.Timestamp.ToLocalTime().ToString("hh:mm d MMMM yyyy")</small>
     </p>
 </div>
 <div>
-    <p>
-        @blogPost.Text
-    </p>
+    <p class="multiline">@blogPost.Text</p>
 </div>
 @if (userName == blogPost.Author)
 {

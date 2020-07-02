@@ -12,15 +12,15 @@
     </p>
 
     <h4>Latest Posts</h4>
-    <ul>
+    <ul class="list-group list-group-flush">
         @foreach (BlogPostEntity post in request.BlogPosts)
         {
-            <li>
+            <li class="list-group-item">
                 <h4>
                     <NavLink href="@($"/detail/{PrettyPrinter.DateStringFromBlogPostPartitionKey(post.PartitionKey)}/{post.RowKey}")">@post.Title</NavLink>
                 </h4>
                 <p>
-                    <small>By @post.Author -- Last Updated @post.Timestamp.ToLocalTime()</small>
+                    <small>By @post.Author &mdash; @post.Timestamp.ToLocalTime().ToString("d MMMM yyyy")</small>
                 </p>
             </li>
         }

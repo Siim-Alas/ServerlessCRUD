@@ -16,6 +16,10 @@ a, .btn-link {
     border-color: #1861ac;
 }
 
+.multiline {
+    white-space: pre;
+}
+
 app {
     position: relative;
     display: flex;
@@ -96,7 +100,7 @@ app {
 }
 
 .centered {
-    margin: 100px auto;
+    margin: 50px auto;
 }
 
 .sidebar {

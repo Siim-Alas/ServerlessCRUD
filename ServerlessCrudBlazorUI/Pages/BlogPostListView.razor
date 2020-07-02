@@ -5,38 +5,43 @@
 @using ServerlessCrudClassLibrary.Utilities
 @inject UnauthorizedCrudFunctionAPIClient client
 
-<h3>BlogPostListView</h3>
+<h3>Blog Posts</h3>
 
 @if (hasInitialized)
 {
-    @foreach (BlogPostEntity post in blogPosts[index])
-    {
-        <div class="card">
-            <div class="card-header">
-                <h4>
-                    <NavLink href="@($"/detail/{PrettyPrinter.DateStringFromBlogPostPartitionKey(post.PartitionKey)}/{post.RowKey}")">@post.Title</NavLink>
-                </h4>
-                <p>
-                    <small>By @post.Author -- Last Updated @post.Timestamp.ToLocalTime()</small>
-                </p>
-            </div>
-            <div class="card-body">
-                <p class="card-text">
-                    @post.Text
-                </p>
-            </div>
-        </div>
-    }
+    <ul class="list-group">
+        @foreach (BlogPostEntity post in blogPosts[index])
+        {
+            <NavLink class="list-group-item  list-group-item-action" 
+                     href="@($"/detail/{PrettyPrinter.DateStringFromBlogPostPartitionKey(post.PartitionKey)}/{post.RowKey}")">
+                <div>
+                    <h4>
+                        @post.Title
+                    </h4>
+                    <p class="text-muted">
+                        By @post.Author &mdash; @post.Timestamp.ToLocalTime().ToString("d MMMM yyyy")
+                    </p>
+                </div>
+                <div class="">
+                    <p class="">
+                        @((post.Text.Length < 300) ? post.Text : $"{post.Text.Substring(0, 300)} ...")
+                    </p>
+                </div>
+            </NavLink>
+        }
+    </ul>
 
     <ul class="pagination justify-content-center">
         <li class="page-item @((index == 0) ? "disabled" : "")">
             <button class="page-link" type="button" @onclick="Previous">Previous</button>
         </li>
 
-        @for (int i = 1; i <= numOfPages; i++)
+        @for (int i = (index < radiusOfPages) ? 0 : index - radiusOfPages; i <= ((index + radiusOfPages < numOfPages) ? index + radiusOfPages : numOfPages - 1); i++)
         {
-            <li class="page-item @((i - 1 == index) ? "active" : "")">
-                <button class="page-link" type="button">@i</button>
+            // Workaround, since i gets incremented, but a is declared local to the loop.
+            int a = i;
+            <li class="page-item @((i == index) ? "active" : "")">
+                <button class="page-link" type="button" @onclick="@(async() => await GoToIndex(a))">@(i + 1)</button>
             </li>
         }
 
@@ -54,15 +59,17 @@ else
 
 @code {
     private bool hasInitialized = false;
-    private readonly static int numberOfEntitiesOnPage = 4;
+    private readonly static int numberOfEntitiesOnPage = 2;
+    private readonly static int radiusOfPages = 3;
 
     private int index { get; set; } = 0;
-    private ListBlogPostEntitiesRequest request { get; set; } = new ListBlogPostEntitiesRequest(numberOfEntitiesOnPage);
+    private ListBlogPostEntitiesRequest request { get; set; } = new ListBlogPostEntitiesRequest(takeCount: numberOfEntitiesOnPage);
     private List<List<BlogPostEntity>> blogPosts { get; set; }
     private TableMetadata metadata { get; set; }
     private string userName { get; set; }
 
     private int numOfPages { get { return (int)Math.Ceiling((decimal)(metadata.NumberOfEntities) / (decimal)numberOfEntitiesOnPage); } }
+    private bool allPagesDisplayed { get { return numOfPages <= 2 *radiusOfPages + 1; } }
 
     private async Task GetNewPosts()
     {
