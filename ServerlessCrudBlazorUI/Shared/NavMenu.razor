@@ -1,21 +1,21 @@
 ﻿@inject AuthenticationStateProvider authStateProvider
 
-<div class="pl-4 navbar navbar-dark">
+<div class="pr-0 navbar navbar-dark">
     <ul class="nav flex-row w-100">
-        <li class="nav-item px-3">
+        <li class="nav-item px-sm-3">
             <NavLink class="nav-link navbar-brand" href="" Match="NavLinkMatch.All">
                 <span class="oi oi-home" aria-hidden="true"></span> <span class="hide-on-small-screen">Home</span>
             </NavLink>
         </li>
         @if (userIsAuthenticated)
         {
-            <li class="nav-item px-3">
+            <li class="nav-item px-sm-3">
                 <NavLink class="nav-link" href="editor">
                     <span class="oi oi-pencil" aria-hidden="true"></span> <span class="hide-on-small-screen">New Blog Post</span>
                 </NavLink>
             </li>
         }
-        <li class="nav-item px-3">
+        <li class="nav-item px-sm-3">
             <NavLink class="nav-link" href="blogposts">
                 <span class="oi oi-book" aria-hidden="true"></span> <span class="hide-on-small-screen">Blog Posts</span>
             </NavLink>

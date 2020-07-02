@@ -2,7 +2,7 @@
 @using ServerlessCrudBlazorUI.Services
 @inject UnauthorizedCrudFunctionAPIClient client
 
-<div class="sidebar ml-4 p-4">
+<div class="sidebar p-4">
     <h4>About you</h4>
     <p>
         Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vivamus volutpat mi id nibh rhoncus consectetur.
@@ -24,6 +24,10 @@
             </li>
         }
     </ul>
+    @if (request.BlogPosts.Count == 0)
+    {
+        <p>Fetching blog posts...</p>
+    }
 </div>
 
 @code {
