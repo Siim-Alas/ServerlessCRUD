@@ -41,13 +41,11 @@
 
 @if (blogPostAlreadyExists)
 {
-    <button type="button" @onclick="OnRollbackButtonClicked">Rollback</button>
-    <button type="button" @onclick="OnDeleteButtonClicked">Delete</button>
+    <button class="btn btn-danger" type="button" @onclick="OnDeleteButtonClicked">Delete</button>
 }
 
 @code {
     private BlogPostEntity blogPost { get; set; } = new BlogPostEntity("title", "author", "...");
-    private BlogPostEntity backup { get; set; }
     private bool blogPostAlreadyExists { get; set; } = false;
 
     private async Task OnValidSubmit()
@@ -63,11 +61,6 @@
         }
     }
 
-    private void OnRollbackButtonClicked()
-    {
-        blogPost = backup.Clone();
-    }
-
     private async Task OnDeleteButtonClicked()
     {
         if ((blogPost.IsValid) &&
@@ -78,7 +71,7 @@
         {
             await JsRuntime.InvokeVoidAsync(
                 "alert",
-                ((await authorizedClient.PostDeleteBlogPostEntityAsync(backup)).StatusCode == System.Net.HttpStatusCode.OK) ?
+                ((await authorizedClient.PostDeleteBlogPostEntityAsync(blogPost)).StatusCode == System.Net.HttpStatusCode.OK) ?
                 "Your blog post has been deleted." : "Something went wrong.");
 
             navigationManager.NavigateTo("/blogposts");
@@ -96,8 +89,6 @@
         {
             blogPostAlreadyExists = true;
             blogPost = await unauthorizedClient.GetBlogPostEntityAsync(pk, rk);
-
-            backup = blogPost.Clone();
         }
         else
         {

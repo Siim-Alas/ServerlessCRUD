@@ -35,10 +35,10 @@
 
     <ul class="pagination justify-content-center">
         <li class="page-item">
-            <button class="page-link" type="button" @onclick="@(async() => await GoToIndex(0))">First</button>
+            <button class="page-link" type="button" @onclick="@(async () => await GoToIndex(0))">First</button>
         </li>
         <li class="page-item @((index == 0) ? "disabled" : "")">
-            <button class="page-link" type="button" @onclick="Previous">Previous</button>
+            <button class="page-link" type="button" @onclick="@(async () => await GoToIndex(index - 1))">Previous</button>
         </li>
 
         @for (int i = (index < radiusOfPages) ? 0 : index - radiusOfPages; i <= ((index + radiusOfPages < numOfPages) ? index + radiusOfPages : numOfPages - 1); i++)
@@ -51,7 +51,7 @@
         }
 
         <li class="page-item @((index + 1 < numOfPages) ? "" : "disabled")">
-            <button class="page-link" type="button" @onclick="Next">Next</button>
+            <button class="page-link" type="button" @onclick="@(async() => await GoToIndex(index + 1))">Next</button>
         </li>
         <li class="page-item">
             <button class="page-link" type="button" @onclick="@(async() => await GoToIndex(numOfPages - 1))">Last</button>
@@ -71,95 +71,48 @@ else
     private readonly static int radiusOfPages = 3;
 
     private int index { get; set; } = 0;
-    private QueryBlogPostEntitiesRequest request { get; set; }
-    private List<List<BlogPostEntity>> blogPosts { get; set; }
-    private TableMetadata metadata { get; set; }
-    private string userName { get; set; }
+    private (string pk, string rk)[] catalog { get; set; }
+    private BlogPostEntity[][] blogPosts { get; set; }
 
-    private int numOfPages { get { return (int)Math.Ceiling((decimal)(metadata.NumberOfEntities) / (decimal)numberOfEntitiesOnPage); } }
-    private bool allPagesDisplayed { get { return numOfPages <= 2 * radiusOfPages + 1; } }
-
-    private async Task GetNewPosts()
-    {
-        request = await client.PostQueryBlogPostsRequestAsync(request);
-    }
+    private int numOfPages { get { return (int)Math.Ceiling((decimal)(catalog.Length) / (decimal)numberOfEntitiesOnPage); } }
 
     private async Task GoToIndex(int i)
     {
-        // Go "back" (left).
-        if (i < index)
+        if (blogPosts[i] == null)
         {
-            // The page is already loaded into memory.
-            if (blogPosts[i].Count > 0)
-            {
-                index = i;
-                return;
-            }
-            // Else, go back until you find the first page loaded into memory.
-            int j = index;
-            int k = 0;
-            while (blogPosts[--j].Count == 0)
-            {
-                // Count the amount of pages to be skipped.
-                k++;
-            }
-            // Configure the request.
-            request.ContinuationToken = new TableContinuationToken()
-            {
-                NextPartitionKey = blogPosts[j].Last().PartitionKey,
-                NextRowKey = blogPosts[j].Last().RowKey,
-                NextTableName = null,
-                TargetLocation = StorageLocation.Primary
-            };
-            request.Skip = 1 + k * numberOfEntitiesOnPage;
-
-            request = await client.PostQueryBlogPostsRequestAsync(request);
-            blogPosts[i] = request.BlogPosts;
-            index = i;
-
+            blogPosts[i] = (await client.GetQueryBlogPostsResponseAsync(
+                    selectColumns: new List<string>()
+                    {
+                        "PartitionKey",
+                        "RowKey",
+                        "Timestamp",
+                        "Author",
+                        "Text"
+                    },
+                    takeCount: numberOfEntitiesOnPage,
+                    nextKeys: catalog[i * numberOfEntitiesOnPage]
+                )).BlogPosts.ToArray();
         }
-        // Go "forwards" (right).
-        else if (i > index)
-        {
-            request.Skip = (i - index - 1) * numberOfEntitiesOnPage;
-            request = await client.PostQueryBlogPostsRequestAsync(request);
-            blogPosts[i] = request.BlogPosts;
-            index = i;
-        }
-    }
-
-    private void Previous()
-    {
-        if (--index < 0)
-        {
-            index = 0;
-        }
-    }
-
-    private async Task Next()
-    {
-        if (index + 1 < numOfPages)
-        {
-            await GetNewPosts();
-            blogPosts.Add(request.BlogPosts);
-            index++;
-        }
+        index = i;
     }
 
     protected override async Task OnInitializedAsync()
     {
         await base.OnInitializedAsync();
 
-        metadata = await client.GetTableMetadataAsync();
+        catalog = (from post in (await client.GetQueryBlogPostsResponseAsync(
+                       takeCount: 1000,
+                       selectColumns: new List<string>()
+                       {
+                           "PartitionKey",
+                           "RowKey"
+                           })).BlogPosts
+                   select (post.PartitionKey, post.RowKey))
+                   .ToArray();
 
-        request = new QueryBlogPostEntitiesRequest(takeCount: numberOfEntitiesOnPage);
+        blogPosts = new BlogPostEntity[numOfPages][];
 
-        await GetNewPosts();
-
-        blogPosts = new List<List<BlogPostEntity>>(numOfPages)
-        {
-            request.BlogPosts
-        };
+        await GoToIndex(0);
 
         hasInitialized = true;
     }

@@ -15,6 +15,7 @@ using System.Security.Claims;
 using System.Runtime.CompilerServices;
 using System.IdentityModel.Tokens.Jwt;
 using ServerlessCrudFunctions.Services;
+using Microsoft.AspNetCore.Mvc.ModelBinding.Validation;
 
 namespace ServerlessCrudFunctions
 {
@@ -27,43 +28,58 @@ namespace ServerlessCrudFunctions
 
         [FunctionName("QueryBlogPostEntities")]
         public async Task<IActionResult> Run(
-            [HttpTrigger(AuthorizationLevel.Anonymous, "post", Route = null)] HttpRequest req,
+            [HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = null)] HttpRequest req,
             [Table("blogposts", "AzureWebJobsStorage")] CloudTable table,
             ILogger log)
         {
             try
             {
-                QueryBlogPostEntitiesRequest request = JsonConvert.DeserializeObject<QueryBlogPostEntitiesRequest>(
-                    await req.ReadAsStringAsync()
-                    );
+                // Int default value isn't null so it is assumed to be always included.
+                int skip = Convert.ToInt32(req.Query["skip"]);
+                int takeCount = Convert.ToInt32(req.Query["takecount"]);
 
-                while (request.Skip > 0)
+                req.Query.TryGetValue("filterstring", out var filterString);
+
+                List<string> selectColumns = 
+                    req.Query.TryGetValue("selectcolumns", out var selectColumnsString) ?
+                    JsonConvert.DeserializeObject<List<string>>(selectColumnsString) : 
+                    new List<string>() { "PartitionKey" };
+
+                TableContinuationToken token = 
+                    (req.Query.TryGetValue("newxtpartitionkey", out var nextPk) &&
+                    req.Query.TryGetValue("nextrowkey", out var nextRk)) ?
+                    new TableContinuationToken()
+                    {
+                        NextPartitionKey = nextPk,
+                        NextRowKey = nextRk,
+                        NextTableName = null,
+                        TargetLocation = StorageLocation.Primary
+                    } : null;
+
+                while (skip > 0)
                 {
                     TableQuerySegment<BlogPostEntity> r = await table.ExecuteQuerySegmentedAsync(
                         new TableQuery<BlogPostEntity>() 
                         { 
-                            TakeCount = request.Skip, 
+                            TakeCount = skip, 
                             SelectColumns = new List<string>() { "PartitionKey" }
                         }, 
-                        request.ContinuationToken
+                        token
                         );
-                    request.Skip -= r.Results.Count;
-                    request.ContinuationToken = r.ContinuationToken;
+                    skip -= r.Results.Count;
+                    token = r.ContinuationToken;
                 }
-
+                
                 TableQuerySegment<BlogPostEntity> result = await table.ExecuteQuerySegmentedAsync(
-                    new TableQuery<BlogPostEntity>() 
+                    new TableQuery<BlogPostEntity>()
                     {
-                        FilterString = request.FilterString,
-                        SelectColumns = request.SelectColumns,
-                        TakeCount = request.TakeCount
+                        FilterString = filterString,
+                        SelectColumns = selectColumns,
+                        TakeCount = takeCount
                     },
-                    request.ContinuationToken);
+                    token);
 
-                request.BlogPosts = result.Results;
-                request.ContinuationToken = result.ContinuationToken;
-
-                return new OkObjectResult(request);
+                return new OkObjectResult(new QueryBlogPostEntitiesResponse(token, result.Results));
             }
             catch (Exception e)
             {

@@ -1,7 +1,6 @@
 ﻿@using ServerlessCrudClassLibrary
 @using ServerlessCrudBlazorUI.Services
 @using ServerlessCrudClassLibrary.Utilities
-@using Microsoft.Azure.Cosmos.Table
 
 @inject UnauthorizedCrudFunctionAPIClient client
 
@@ -15,7 +14,7 @@
 
     <h4>Latest Posts</h4>
     <ul class="list-group list-group-flush">
-        @foreach (BlogPostEntity post in request.BlogPosts)
+        @foreach (BlogPostEntity post in response.BlogPosts)
         {
             <li class="list-group-item">
                 <h4>
@@ -27,22 +26,23 @@
             </li>
         }
     </ul>
-    @if (request.BlogPosts.Count == 0)
+    @if (!hasInitialized)
     {
         <p>Fetching blog posts...</p>
     }
 </div>
 
 @code {
-    private QueryBlogPostEntitiesRequest request { get; set; }
+    private QueryBlogPostEntitiesResponse response { get; set; } = new QueryBlogPostEntitiesResponse(null, new List<BlogPostEntity>());
+    private bool hasInitialized { get; set; } = false;
 
     protected override async Task OnInitializedAsync()
     {
         await base.OnInitializedAsync();
 
-        request = new QueryBlogPostEntitiesRequest(
+        response = await client.GetQueryBlogPostsResponseAsync(
             takeCount: 4,
-            selectColumns: new List<string>() 
+            selectColumns: new List<string>()
             {
                 "PartitionKey",
                 "RowKey",
@@ -50,6 +50,6 @@
                 "Author"
             });
 
-        request = await client.PostQueryBlogPostsRequestAsync(request);
+        hasInitialized = true;
     }
 }

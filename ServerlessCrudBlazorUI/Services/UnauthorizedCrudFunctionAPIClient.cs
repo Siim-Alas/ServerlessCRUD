@@ -19,21 +19,31 @@ namespace ServerlessCrudBlazorUI.Services
             _client.BaseAddress = new Uri("https://serverlesscrud.azurewebsites.net/api/");
         }
 
-        public async Task<QueryBlogPostEntitiesRequest> PostQueryBlogPostsRequestAsync(QueryBlogPostEntitiesRequest request)
-        {
+        public async Task<QueryBlogPostEntitiesResponse> GetQueryBlogPostsResponseAsync(
+            int skip = 0, 
+            string filterString = null,
+            IList<string> selectColumns = null,
+            int takeCount = 4,
+            (string partitionKey, string rowKey)? nextKeys = null)
+            {
             try
             {
-                return JsonConvert.DeserializeObject<QueryBlogPostEntitiesRequest>(
-                    await (await _client.PostAsJsonAsync(
-                           "QueryBlogPostEntities",
-                           request
-                           )).Content.ReadAsStringAsync()
-                    );
+                // Int default value isn't null so it is assumed to be always included.
+                return await _client.GetFromJsonAsync<QueryBlogPostEntitiesResponse>(
+                           string.Format(
+                               "QueryBlogPostEntities?{0}{1}{2}{3}{4}{5}", 
+                               $"skip={skip}",
+                               $"&takecount={takeCount}",
+                               (filterString == null) ? "" : $"&filterstring={filterString}",
+                               (selectColumns == null) ? "" : $"&selectcolumns={JsonConvert.SerializeObject(selectColumns)}",
+                               (nextKeys?.partitionKey == null) ? "" : $"&newxtpartitionkey={nextKeys?.partitionKey}",
+                               (nextKeys?.rowKey == null) ? "" : $"&nextrowkey={nextKeys?.rowKey}")
+                           );
             }
             catch (Exception e)
             {
                 Console.WriteLine(e);
-                return request;
+                return new QueryBlogPostEntitiesResponse(null, new List<BlogPostEntity>());
             }
         }
 
@@ -41,31 +51,12 @@ namespace ServerlessCrudBlazorUI.Services
         {
             try
             {
-                return JsonConvert.DeserializeObject<BlogPostEntity>(
-                    await (await _client.GetAsync(
-                        $"ReadBlogPostEntity?partitionkey={partitionKey}&rowkey={rowKey}"
-                        )).Content.ReadAsStringAsync()
-                    );
+                return await _client.GetFromJsonAsync<BlogPostEntity>(
+                    $"ReadBlogPostEntity?partitionkey={partitionKey}&rowkey={rowKey}");
             }
             catch
             {
                 return new BlogPostEntity("Error", "Blazor Bot", "Something has gone wrong processing your request.");
-            }
-        }
-
-        public async Task<TableMetadata> GetTableMetadataAsync()
-        {
-            try
-            {
-                return JsonConvert.DeserializeObject<TableMetadata>(
-                    await (await _client.GetAsync(
-                        "GetBlogPostsTableMetadata"
-                        )).Content.ReadAsStringAsync()
-                    );
-            }
-            catch
-            {
-                return new TableMetadata(0);
             }
         }
     }
