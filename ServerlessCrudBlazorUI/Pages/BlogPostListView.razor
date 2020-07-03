@@ -35,10 +35,14 @@
 
     <ul class="pagination justify-content-center">
         <li class="page-item">
-            <button class="page-link" type="button" @onclick="@(async () => await GoToIndex(0))">First</button>
+            <button class="page-link" type="button" @onclick="@(async () => await GoToIndex(0))">
+                <i class="fa fa-angle-double-left"></i>
+            </button>
         </li>
         <li class="page-item @((index == 0) ? "disabled" : "")">
-            <button class="page-link" type="button" @onclick="@(async () => await GoToIndex(index - 1))">Previous</button>
+            <button class="page-link" type="button" @onclick="@(async () => await GoToIndex(index - 1))">
+                <i class="fa fa-angle-left"></i>
+            </button>
         </li>
 
         @for (int i = (index < radiusOfPages) ? 0 : index - radiusOfPages; i <= ((index + radiusOfPages < numOfPages) ? index + radiusOfPages : numOfPages - 1); i++)
@@ -51,10 +55,14 @@
         }
 
         <li class="page-item @((index + 1 < numOfPages) ? "" : "disabled")">
-            <button class="page-link" type="button" @onclick="@(async() => await GoToIndex(index + 1))">Next</button>
+            <button class="page-link" type="button" @onclick="@(async() => await GoToIndex(index + 1))">
+                <i class="fa fa-angle-right"></i>
+            </button>
         </li>
         <li class="page-item">
-            <button class="page-link" type="button" @onclick="@(async() => await GoToIndex(numOfPages - 1))">Last</button>
+            <button class="page-link" type="button" @onclick="@(async() => await GoToIndex(numOfPages - 1))">
+                <i class="fa fa-angle-double-right"></i>
+            </button>
         </li>
     </ul>
 }
@@ -68,7 +76,7 @@ else
 @code {
     private bool hasInitialized = false;
     private readonly static int numberOfEntitiesOnPage = 2;
-    private readonly static int radiusOfPages = 3;
+    private readonly static int radiusOfPages = 2;
 
     private int index { get; set; } = 0;
     private (string pk, string rk)[] catalog { get; set; }

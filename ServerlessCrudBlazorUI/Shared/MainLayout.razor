@@ -2,7 +2,7 @@
     
 @inject IJSRuntime JsRuntime
 
-<div class="page-header">
+<div @ref="headerReference" class="page-header">
     <h1 class="display-4"><i class="fa fa-user-circle"></i> Welcome to your blog!</h1>
     <p>
         A Blazor Crud demo.
@@ -38,6 +38,7 @@
     // Workaround, since position: sticky; doesn't work with the overflow property set.
 
     private ElementReference topRowReference;
+    private ElementReference headerReference;
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
@@ -45,7 +46,7 @@
 
         if (firstRender)
         {
-            await JsRuntime.InvokeVoidAsync("OwnStickifier.stickify", topRowReference);
+            await JsRuntime.InvokeVoidAsync("OwnStickifier.stickify", topRowReference, headerReference);
         }
     }
 }
