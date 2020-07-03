@@ -3,7 +3,6 @@
 @using ServerlessCrudClassLibrary
 @using ServerlessCrudBlazorUI.Services
 @using ServerlessCrudClassLibrary.Utilities
-@using Microsoft.Azure.Cosmos.Table
 
 @inject UnauthorizedCrudFunctionAPIClient client
 
@@ -34,7 +33,7 @@
     </ul>
 
     <ul class="pagination justify-content-center">
-        <li class="page-item">
+        <li class="page-item  @((index == 0) ? "disabled" : "")">
             <button class="page-link" type="button" @onclick="@(async () => await GoToIndex(0))">
                 <i class="fa fa-angle-double-left"></i>
             </button>
@@ -59,7 +58,7 @@
                 <i class="fa fa-angle-right"></i>
             </button>
         </li>
-        <li class="page-item">
+        <li class="page-item @((index + 1 < numOfPages) ? "" : "disabled")">
             <button class="page-link" type="button" @onclick="@(async() => await GoToIndex(numOfPages - 1))">
                 <i class="fa fa-angle-double-right"></i>
             </button>
