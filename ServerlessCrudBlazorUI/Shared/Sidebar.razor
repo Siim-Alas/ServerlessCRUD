@@ -1,6 +1,8 @@
 ﻿@using ServerlessCrudClassLibrary
 @using ServerlessCrudBlazorUI.Services
 @using ServerlessCrudClassLibrary.Utilities
+@using Microsoft.Azure.Cosmos.Table
+
 @inject UnauthorizedCrudFunctionAPIClient client
 
 <div class="sidebar p-4">
@@ -32,12 +34,22 @@
 </div>
 
 @code {
-    private ListBlogPostEntitiesRequest request { get; set; } = new ListBlogPostEntitiesRequest(4);
+    private QueryBlogPostEntitiesRequest request { get; set; }
 
     protected override async Task OnInitializedAsync()
     {
         await base.OnInitializedAsync();
 
-        request = await client.PostListBlogPostsRequestAsync(request);
+        request = new QueryBlogPostEntitiesRequest(
+            takeCount: 4,
+            selectColumns: new List<string>() 
+            {
+                "PartitionKey",
+                "RowKey",
+                "Timestamp",
+                "Author"
+            });
+
+        request = await client.PostQueryBlogPostsRequestAsync(request);
     }
 }

@@ -18,14 +18,14 @@ using ServerlessCrudFunctions.Services;
 
 namespace ServerlessCrudFunctions
 {
-    public class ListBlogPostEntities
+    public class QueryBlogPostEntities
     {
-        public ListBlogPostEntities()
+        public QueryBlogPostEntities()
         {
             
         }
 
-        [FunctionName("ListBlogPostEntities")]
+        [FunctionName("QueryBlogPostEntities")]
         public async Task<IActionResult> Run(
             [HttpTrigger(AuthorizationLevel.Anonymous, "post", Route = null)] HttpRequest req,
             [Table("blogposts", "AzureWebJobsStorage")] CloudTable table,
@@ -33,7 +33,7 @@ namespace ServerlessCrudFunctions
         {
             try
             {
-                ListBlogPostEntitiesRequest request = JsonConvert.DeserializeObject<ListBlogPostEntitiesRequest>(
+                QueryBlogPostEntitiesRequest request = JsonConvert.DeserializeObject<QueryBlogPostEntitiesRequest>(
                     await req.ReadAsStringAsync()
                     );
 
@@ -52,7 +52,12 @@ namespace ServerlessCrudFunctions
                 }
 
                 TableQuerySegment<BlogPostEntity> result = await table.ExecuteQuerySegmentedAsync(
-                    new TableQuery<BlogPostEntity>() { TakeCount = request.TakeCount },
+                    new TableQuery<BlogPostEntity>() 
+                    {
+                        FilterString = request.FilterString,
+                        SelectColumns = request.SelectColumns,
+                        TakeCount = request.TakeCount
+                    },
                     request.ContinuationToken);
 
                 request.BlogPosts = result.Results;
@@ -62,7 +67,7 @@ namespace ServerlessCrudFunctions
             }
             catch (Exception e)
             {
-                log.LogError($"function ListBlogPostEntities -- caught exception {e} {e.Message} {e.StackTrace}");
+                log.LogError($"function QueryBlogPostEntities -- caught exception {e} {e.Message} {e.StackTrace}");
                 return new InternalServerErrorResult();
             }
         }

@@ -19,13 +19,13 @@ namespace ServerlessCrudBlazorUI.Services
             _client.BaseAddress = new Uri("https://serverlesscrud.azurewebsites.net/api/");
         }
 
-        public async Task<ListBlogPostEntitiesRequest> PostListBlogPostsRequestAsync(ListBlogPostEntitiesRequest request)
+        public async Task<QueryBlogPostEntitiesRequest> PostQueryBlogPostsRequestAsync(QueryBlogPostEntitiesRequest request)
         {
             try
             {
-                return JsonConvert.DeserializeObject<ListBlogPostEntitiesRequest>(
+                return JsonConvert.DeserializeObject<QueryBlogPostEntitiesRequest>(
                     await (await _client.PostAsJsonAsync(
-                           "ListBlogPostEntities",
+                           "QueryBlogPostEntities",
                            request
                            )).Content.ReadAsStringAsync()
                     );

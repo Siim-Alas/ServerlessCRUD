@@ -3,6 +3,8 @@
 @using ServerlessCrudClassLibrary
 @using ServerlessCrudBlazorUI.Services
 @using ServerlessCrudClassLibrary.Utilities
+@using Microsoft.Azure.Cosmos.Table
+
 @inject UnauthorizedCrudFunctionAPIClient client
 
 <h3>Blog Posts</h3>
@@ -12,7 +14,7 @@
     <ul class="list-group">
         @foreach (BlogPostEntity post in blogPosts[index])
         {
-            <NavLink class="list-group-item  list-group-item-action" 
+            <NavLink class="list-group-item  list-group-item-action"
                      href="@($"/detail/{PrettyPrinter.DateStringFromBlogPostPartitionKey(post.PartitionKey)}/{post.RowKey}")">
                 <div>
                     <h4>
@@ -32,6 +34,9 @@
     </ul>
 
     <ul class="pagination justify-content-center">
+        <li class="page-item">
+            <button class="page-link" type="button" @onclick="@(async() => await GoToIndex(0))">First</button>
+        </li>
         <li class="page-item @((index == 0) ? "disabled" : "")">
             <button class="page-link" type="button" @onclick="Previous">Previous</button>
         </li>
@@ -48,6 +53,9 @@
         <li class="page-item @((index + 1 < numOfPages) ? "" : "disabled")">
             <button class="page-link" type="button" @onclick="Next">Next</button>
         </li>
+        <li class="page-item">
+            <button class="page-link" type="button" @onclick="@(async() => await GoToIndex(numOfPages - 1))">Last</button>
+        </li>
     </ul>
 }
 else
@@ -63,29 +71,60 @@ else
     private readonly static int radiusOfPages = 3;
 
     private int index { get; set; } = 0;
-    private ListBlogPostEntitiesRequest request { get; set; } = new ListBlogPostEntitiesRequest(takeCount: numberOfEntitiesOnPage);
+    private QueryBlogPostEntitiesRequest request { get; set; }
     private List<List<BlogPostEntity>> blogPosts { get; set; }
     private TableMetadata metadata { get; set; }
     private string userName { get; set; }
 
     private int numOfPages { get { return (int)Math.Ceiling((decimal)(metadata.NumberOfEntities) / (decimal)numberOfEntitiesOnPage); } }
-    private bool allPagesDisplayed { get { return numOfPages <= 2 *radiusOfPages + 1; } }
+    private bool allPagesDisplayed { get { return numOfPages <= 2 * radiusOfPages + 1; } }
 
     private async Task GetNewPosts()
     {
-        request = await client.PostListBlogPostsRequestAsync(request);
+        request = await client.PostQueryBlogPostsRequestAsync(request);
     }
 
     private async Task GoToIndex(int i)
     {
-        while (index > i)
+        // Go "back" (left).
+        if (i < index)
         {
-            Previous();
-        }
+            // The page is already loaded into memory.
+            if (blogPosts[i].Count > 0)
+            {
+                index = i;
+                return;
+            }
+            // Else, go back until you find the first page loaded into memory.
+            int j = index;
+            int k = 0;
+            while (blogPosts[--j].Count == 0)
+            {
+                // Count the amount of pages to be skipped.
+                k++;
+            }
+            // Configure the request.
+            request.ContinuationToken = new TableContinuationToken()
+            {
+                NextPartitionKey = blogPosts[j].Last().PartitionKey,
+                NextRowKey = blogPosts[j].Last().RowKey,
+                NextTableName = null,
+                TargetLocation = StorageLocation.Primary
+            };
+            request.Skip = 1 + k * numberOfEntitiesOnPage;
 
-        while (index < i)
+            request = await client.PostQueryBlogPostsRequestAsync(request);
+            blogPosts[i] = request.BlogPosts;
+            index = i;
+
+        }
+        // Go "forwards" (right).
+        else if (i > index)
         {
-            await Next();
+            request.Skip = (i - index - 1) * numberOfEntitiesOnPage;
+            request = await client.PostQueryBlogPostsRequestAsync(request);
+            blogPosts[i] = request.BlogPosts;
+            index = i;
         }
     }
 
@@ -111,8 +150,12 @@ else
     {
         await base.OnInitializedAsync();
 
-        await GetNewPosts();
         metadata = await client.GetTableMetadataAsync();
+
+        request = new QueryBlogPostEntitiesRequest(takeCount: numberOfEntitiesOnPage);
+
+        await GetNewPosts();
+
         blogPosts = new List<List<BlogPostEntity>>(numOfPages)
         {
             request.BlogPosts
