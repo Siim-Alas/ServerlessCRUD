@@ -3,7 +3,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
 
 namespace ServerlessCrudBlazorUI.Services
 {
@@ -136,7 +135,6 @@ namespace ServerlessCrudBlazorUI.Services
             {
                 if (closingChars.Contains(markdown[i]) && mdStack.Count > 0)
                 {
-                    Console.WriteLine("true");
                     // Check if the current tag is being closed.
                     currentSyntax = closingMdStrings[mdStack.Peek()];
                     if (markdown.Substring(i, currentSyntax.Length) == currentSyntax)
