@@ -17,9 +17,9 @@ namespace ServerlessCrudBlazorUI.Services
         {
             Italic,
             Bold,
-            Heading1,
-            Heading2,
-            // Links are not supported.
+            Heading3,
+            Heading4,
+            Link,
             Image,
             BlockQuote,
             // Unordered lists not supported.
@@ -35,9 +35,9 @@ namespace ServerlessCrudBlazorUI.Services
             {
                 { "*", MdEnum.Italic },
                 { "**", MdEnum.Bold }, 
-                { "# ", MdEnum.Heading1 }, 
-                { "## ", MdEnum.Heading2 }, 
-                // Links are not supported.
+                { "# ", MdEnum.Heading3 }, 
+                { "## ", MdEnum.Heading4 },
+                { "](", MdEnum.Link },
                 { "![Image](", MdEnum.Image }, 
                 { "> ", MdEnum.BlockQuote },
                 // Unordered lists not supported.
@@ -53,9 +53,9 @@ namespace ServerlessCrudBlazorUI.Services
             {
                 { MdEnum.Italic, "*" },
                 { MdEnum.Bold, "**" },
-                { MdEnum.Heading1, "\n" },
-                { MdEnum.Heading2, "\n" },
-                // Links are not supported.
+                { MdEnum.Heading3, "\n" },
+                { MdEnum.Heading4, "\n" },
+                { MdEnum.Link, ")" },
                 { MdEnum.Image, ")" },
                 { MdEnum.BlockQuote, "\n" },
                 // Unordered lists not supported.
@@ -71,9 +71,9 @@ namespace ServerlessCrudBlazorUI.Services
             {
                 { MdEnum.Italic, ("<i>", "</i>") },
                 { MdEnum.Bold, ("<b>", "</b>") },
-                { MdEnum.Heading1, ("<h1>", "</h1>") },
-                { MdEnum.Heading2, ("<h2>", "</h2>") },
-                // Links are not supported.
+                { MdEnum.Heading3, ("<h3>", "</h3>") },
+                { MdEnum.Heading4, ("<h4>", "</h4>") },
+                { MdEnum.Link, ("<a target=\"_blank\" href=\"", "</a>") },
                 { MdEnum.Image, ("<img src=\"", "\"/>") },
                 { MdEnum.BlockQuote, ("<blockquote class=\"blockquote\">", "</blockquote>") },
                 // Unordered lists not supported.
@@ -114,7 +114,9 @@ namespace ServerlessCrudBlazorUI.Services
 
             int i = 0;
             int j;
+            int squareBracketIndex = -1;
             string currentSyntax;
+            string linkName = "";
             StringBuilder syntaxBuilder = new StringBuilder();
             IEnumerable<string> candidateTags;
 
@@ -139,6 +141,11 @@ namespace ServerlessCrudBlazorUI.Services
                     currentSyntax = closingMdStrings[mdStack.Peek()];
                     if (markdown.Substring(i, currentSyntax.Length) == currentSyntax)
                     {
+                        // Links are a special case since they have 2 arguments instead of 1.
+                        if (mdStack.Peek() == MdEnum.Link)
+                        {
+                            rawHTMLBuilder.Append($"\">{linkName}");
+                        }
                         // The current tag is being closed.
                         rawHTMLBuilder.Append(htmlTags[mdStack.Pop()].closing);
                         i += currentSyntax.Length;
@@ -160,6 +167,19 @@ namespace ServerlessCrudBlazorUI.Services
 
                     if (openingMdStrings.TryGetValue(markdown.Substring(i, j), out MdEnum tag))
                     {
+                        // Links are a special case since they have 2 arguments instead of 1.
+                        if (tag == MdEnum.Link)
+                        {
+                            // Check for false positives.
+                            if (squareBracketIndex == -1)
+                            {
+                                continue;
+                            }
+
+                            linkName = markdown.Substring(squareBracketIndex + 1, i - squareBracketIndex - 1);
+                            rawHTMLBuilder.Remove(rawHTMLBuilder.Length - linkName.Length - 1, linkName.Length + 1);
+                        }
+                        
                         // A new tag is being opened.
                         mdStack.Push(tag);
                         rawHTMLBuilder.Append(htmlTags[tag].opening);
@@ -167,6 +187,12 @@ namespace ServerlessCrudBlazorUI.Services
                         continue;
                     }
                 }
+                // Special for links
+                if (markdown[i] == '[')
+                {
+                    squareBracketIndex = i;
+                }
+
                 rawHTMLBuilder.Append(markdown[i]);
                 i++;
             }
