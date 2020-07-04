@@ -1,5 +1,4 @@
 using System;
-using System.IO;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Azure.WebJobs;
@@ -10,9 +9,7 @@ using Newtonsoft.Json;
 using Microsoft.Azure.Cosmos.Table;
 using ServerlessCrudClassLibrary;
 using System.Web.Http;
-using System.ComponentModel;
 using ServerlessCrudFunctions.Services;
-using System.Security.Claims;
 using System.Linq;
 
 namespace ServerlessCrudFunctions

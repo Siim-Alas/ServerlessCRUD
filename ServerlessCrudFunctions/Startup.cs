@@ -1,13 +1,6 @@
-﻿using Microsoft.AspNetCore.Authentication;
-using Microsoft.Azure.Functions.Extensions.DependencyInjection;
-using Microsoft.Extensions.Configuration;
+﻿using Microsoft.Azure.Functions.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Options;
-using Microsoft.IdentityModel.Tokens;
 using ServerlessCrudFunctions.Services;
-using System;
-using System.Collections.Generic;
-using System.Text;
 
 [assembly: FunctionsStartup(typeof(ServerlessCrudFunctions.Startup))]
 

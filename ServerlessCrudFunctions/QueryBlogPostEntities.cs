@@ -1,5 +1,4 @@
 using System;
-using System.IO;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Azure.WebJobs;
@@ -11,11 +10,6 @@ using ServerlessCrudClassLibrary;
 using System.Collections.Generic;
 using Microsoft.Azure.Cosmos.Table;
 using System.Web.Http;
-using System.Security.Claims;
-using System.Runtime.CompilerServices;
-using System.IdentityModel.Tokens.Jwt;
-using ServerlessCrudFunctions.Services;
-using Microsoft.AspNetCore.Mvc.ModelBinding.Validation;
 
 namespace ServerlessCrudFunctions
 {
