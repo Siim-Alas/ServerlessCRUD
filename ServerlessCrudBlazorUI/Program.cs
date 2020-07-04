@@ -25,6 +25,10 @@ namespace ServerlessCrudBlazorUI
 
                 options.ProviderOptions.DefaultAccessTokenScopes.Add(
                     "db944478-cbda-4214-8ad6-7b310465ce97/BlogPosts.Read");
+                options.ProviderOptions.DefaultAccessTokenScopes.Add(
+                    "db944478-cbda-4214-8ad6-7b310465ce97/Comments.Read");
+                options.ProviderOptions.DefaultAccessTokenScopes.Add(
+                    "db944478-cbda-4214-8ad6-7b310465ce97/Comments.Write");
             });
 
             await builder.Build().RunAsync();

@@ -26,12 +26,6 @@ app {
     flex-direction: column;
 }
 
-.scrollable-table {
-    display: block;
-    height: 25vh;
-    overflow-y: auto;
-}
-
 .page-header {
     width: 100vw;
     padding: 50px 15vw;
@@ -111,8 +105,8 @@ app {
 
 .sidebar {
     background-color: #f1f1f1;
-    width: 20vw;
-    min-width: 300px;
+    width: 25vw;
+    min-width: 400px;
     margin-bottom: auto;
 }
 

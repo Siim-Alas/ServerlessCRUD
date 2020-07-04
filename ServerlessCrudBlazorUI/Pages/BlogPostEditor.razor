@@ -11,85 +11,90 @@
 @inject IJSRuntime JsRuntime
 @inject AuthenticationStateProvider authStateProvider
 
-<h3>Blog Post Editor</h3>
+<div class="main mb-4">
+    <div class="content pl-4 pb-4">
+        <h3>Blog Post Editor</h3>
 
-<table class="table scrollable-table">
-    <thead>
-        <tr>
-            <th scope="col">Markdown</th>
-            <th scope="col">Result</th>
-        </tr>
-    </thead>
-    <tbody>
-        <tr>
-            <td>*italic*</td>
-            <td>@PrettyPrinter.ParseMarkdownToHTML("*italic*")</td>
-        </tr>
-        <tr>
-            <td>**bold**</td>
-            <td>@PrettyPrinter.ParseMarkdownToHTML("**bold**")</td>
-        </tr>
-        <tr>
-            <td># Heading 1\n</td>
-            <td>@PrettyPrinter.ParseMarkdownToHTML("# Heading 1\n")</td>
-        </tr>
-        <tr>
-            <td>## Heading 2\n</td>
-            <td>@PrettyPrinter.ParseMarkdownToHTML("# Heading 2\n")</td>
-        </tr>
-        <tr>
-            <td>[Link text](https://www.google.com/)</td>
-            <td>@PrettyPrinter.ParseMarkdownToHTML("[Link text](https://www.google.com/)")</td>
-        </tr>
-        <tr>
-            <td>![Image](favicon.ico)</td>
-            <td>@PrettyPrinter.ParseMarkdownToHTML("![Image](favicon.ico)")</td>
-        </tr>
-        <tr>
-            <td>> Blockquote</td>
-            <td>@PrettyPrinter.ParseMarkdownToHTML("> Blockquote")</td>
-        </tr>
-        <tr>
-            <td>---</td>
-            <td>@PrettyPrinter.ParseMarkdownToHTML("---")</td>
-        </tr>
-        <tr>
-            <td>`code`</td>
-            <td>@PrettyPrinter.ParseMarkdownToHTML("`code`")</td>
-        </tr>
-    </tbody>
-</table>
+        <EditForm Model="blogPost" OnValidSubmit="OnValidSubmit">
+            <DataAnnotationsValidator />
+            <ValidationSummary />
 
-<EditForm Model="blogPost" OnValidSubmit="OnValidSubmit">
-    <DataAnnotationsValidator />
-    <ValidationSummary />
+            @if (blogPostAlreadyExists)
+            {
+                <div class="form-group">
+                    <h4>@blogPost.Title</h4>
+                    <p>By @blogPost.Author &mdash; Last updated: @blogPost.Timestamp.ToLocalTime().ToString("hh:mm d MMMM yyyy")</p>
+                </div>
+            }
+            else
+            {
+                <div class="form-group">
+                    <label for="title">Post Title</label>
+                    <InputText id="title" class="form-control" @bind-Value="blogPost.Title"></InputText>
+                </div>
+            }
+            <div class="form-group">
+                <label for="text">Text</label>
+                <InputTextArea id="text" class="form-control" rows="20" @bind-Value="blogPost.Text"></InputTextArea>
+            </div>
 
-    @if (blogPostAlreadyExists)
-    {
-        <div class="form-group">
-            <h4>@blogPost.Title</h4>
-            <p>By @blogPost.Author &mdash; Last updated: @blogPost.Timestamp.ToLocalTime().ToString("hh:mm d MMMM yyyy")</p>
-        </div>
-    }
-    else
-    {
-        <div class="form-group">
-            <label for="title">Post Title</label>
-            <InputText id="title" class="form-control" @bind-Value="blogPost.Title"></InputText>
-        </div>
-    }
-    <div class="form-group">
-        <label for="text">Text</label>
-        <InputTextArea id="text" class="form-control" rows="20" @bind-Value="blogPost.Text"></InputTextArea>
+            <button class="btn btn-dark" type="submit">Submit</button>
+        </EditForm>
+
+        @if (blogPostAlreadyExists)
+        {
+            <button class="btn btn-danger" type="button" @onclick="OnDeleteButtonClicked">Delete</button>
+        }
     </div>
-
-    <button class="btn btn-dark" type="submit">Submit</button>
-</EditForm>
-
-@if (blogPostAlreadyExists)
-{
-    <button class="btn btn-danger" type="button" @onclick="OnDeleteButtonClicked">Delete</button>
-}
+</div>
+<Sidebar>
+    <table class="table">
+        <thead>
+            <tr>
+                <th scope="col">Markdown</th>
+                <th scope="col">Result</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>*italic*</td>
+                <td>@PrettyPrinter.ParseMarkdownToHTML("*italic*")</td>
+            </tr>
+            <tr>
+                <td>**bold**</td>
+                <td>@PrettyPrinter.ParseMarkdownToHTML("**bold**")</td>
+            </tr>
+            <tr>
+                <td># Heading 1\n</td>
+                <td>@PrettyPrinter.ParseMarkdownToHTML("# Heading 1\n")</td>
+            </tr>
+            <tr>
+                <td>## Heading 2\n</td>
+                <td>@PrettyPrinter.ParseMarkdownToHTML("# Heading 2\n")</td>
+            </tr>
+            <tr>
+                <td>[Link text](https://www.google.com/)</td>
+                <td>@PrettyPrinter.ParseMarkdownToHTML("[Link text](https://www.google.com/)")</td>
+            </tr>
+            <tr>
+                <td>![Image](favicon.ico)</td>
+                <td>@PrettyPrinter.ParseMarkdownToHTML("![Image](favicon.ico)")</td>
+            </tr>
+            <tr>
+                <td>> Blockquote</td>
+                <td>@PrettyPrinter.ParseMarkdownToHTML("> Blockquote")</td>
+            </tr>
+            <tr>
+                <td>---</td>
+                <td>@PrettyPrinter.ParseMarkdownToHTML("---")</td>
+            </tr>
+            <tr>
+                <td>`code`</td>
+                <td>@PrettyPrinter.ParseMarkdownToHTML("`code`")</td>
+            </tr>
+        </tbody>
+    </table>
+</Sidebar>
 
 @code {
     private BlogPostEntity blogPost { get; set; } = new BlogPostEntity("title", "author", "...");

@@ -6,21 +6,33 @@
 @inject UnauthorizedCrudFunctionAPIClient client
 @inject AuthenticationStateProvider authStateProvider
 
-<div>
-    <h3>
-        @blogPost.Title
-    </h3>
+<div class="main mb-4">
+    <div class="content pl-4 pb-4">
+        <div>
+            <h3>
+                @blogPost.Title
+            </h3>
+            <p>
+                <small>By @blogPost.Author &mdash; Last updated: @blogPost.Timestamp.ToLocalTime().ToString("hh:mm d MMMM yyyy")</small>
+            </p>
+        </div>
+        <div>
+            <p class="multiline">@PrettyPrinter.ParseMarkdownToHTML(blogPost.Text)</p>
+        </div>
+        @if (userName == blogPost.Author)
+        {
+            <NavLink href="@($"/editor?partitionkey={PrettyPrinter.BlogPostPartitionKeyFromDateString(DateString)}&rowkey={RowKey}")">Edit</NavLink>
+        }
+    </div>
+</div>
+<Sidebar>
+    <h4>About @blogPost.Author</h4>
     <p>
-        <small>By @blogPost.Author &mdash; Last updated: @blogPost.Timestamp.ToLocalTime().ToString("hh:mm d MMMM yyyy")</small>
+        Vivamus id lectus lorem. Curabitur varius lectus mattis, 
+        venenatis mauris tristique, porttitor nulla. Nam et scelerisque sem, 
+        vitae eleifend mi. Proin tincidunt eros non nisi viverra fringilla.
     </p>
-</div>
-<div>
-    <p class="multiline">@PrettyPrinter.ParseMarkdownToHTML(blogPost.Text)</p>
-</div>
-@if (userName == blogPost.Author)
-{
-    <NavLink href="@($"/editor?partitionkey={PrettyPrinter.BlogPostPartitionKeyFromDateString(DateString)}&rowkey={RowKey}")">Edit</NavLink>
-}
+</Sidebar>
 
 @code {
     [Parameter]
