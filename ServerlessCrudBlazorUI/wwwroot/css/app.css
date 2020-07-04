@@ -26,6 +26,12 @@ app {
     flex-direction: column;
 }
 
+.scrollable-table {
+    display: block;
+    height: 25vh;
+    overflow-y: auto;
+}
+
 .page-header {
     width: 100vw;
     padding: 50px 15vw;
