@@ -15,7 +15,7 @@
     </p>
 </div>
 <div>
-    <p class="multiline">@blogPost.Text</p>
+    <p class="multiline">@PrettyPrinter.ParseMarkdownToHTML(blogPost.Text)</p>
 </div>
 @if (userName == blogPost.Author)
 {
