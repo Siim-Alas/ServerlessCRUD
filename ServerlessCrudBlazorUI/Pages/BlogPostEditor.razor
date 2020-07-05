@@ -2,11 +2,12 @@
 
 @using Microsoft.AspNetCore.WebUtilities
 @using Microsoft.Extensions.Primitives
+@using System.Security.Claims
 @using ServerlessCrudClassLibrary
 @using ServerlessCrudBlazorUI.Services
 
 @inject AuthorizedCrudFunctionAPIClient authorizedClient
-@inject UnauthorizedCrudFunctionAPIClient unauthorizedClient
+@inject AnnonymousCrudFunctionAPIClient unauthorizedClient
 @inject NavigationManager navigationManager
 @inject IJSRuntime JsRuntime
 @inject AuthenticationStateProvider authStateProvider
@@ -14,36 +15,38 @@
 <div class="main mb-4">
     <div class="content pl-4 pb-4">
         <h3>Blog Post Editor</h3>
+        @if (hasInitialized)
+        {
+            <EditForm Model="blogPost" OnValidSubmit="OnValidSubmit">
+                <DataAnnotationsValidator />
+                <ValidationSummary />
 
-        <EditForm Model="blogPost" OnValidSubmit="OnValidSubmit">
-            <DataAnnotationsValidator />
-            <ValidationSummary />
+                @if (blogPostAlreadyExists)
+                {
+                    <div class="form-group">
+                        <h4>@blogPost.Title</h4>
+                        <p>By @blogPost.Author &mdash; Last updated: @blogPost.Timestamp.ToLocalTime().ToString("hh:mm d MMMM yyyy")</p>
+                    </div>
+                }
+                else
+                {
+                    <div class="form-group">
+                        <label for="title">Post Title</label>
+                        <InputText id="title" class="form-control" @bind-Value="blogPost.Title"></InputText>
+                    </div>
+                }
+                <div class="form-group">
+                    <label for="text">Text</label>
+                    <InputTextArea id="text" class="form-control" rows="20" @bind-Value="blogPost.Text"></InputTextArea>
+                </div>
+
+                <button class="btn btn-dark" type="submit">Submit</button>
+            </EditForm>
 
             @if (blogPostAlreadyExists)
             {
-                <div class="form-group">
-                    <h4>@blogPost.Title</h4>
-                    <p>By @blogPost.Author &mdash; Last updated: @blogPost.Timestamp.ToLocalTime().ToString("hh:mm d MMMM yyyy")</p>
-                </div>
+                <button class="btn btn-danger" type="button" @onclick="OnDeleteButtonClicked">Delete</button>
             }
-            else
-            {
-                <div class="form-group">
-                    <label for="title">Post Title</label>
-                    <InputText id="title" class="form-control" @bind-Value="blogPost.Title"></InputText>
-                </div>
-            }
-            <div class="form-group">
-                <label for="text">Text</label>
-                <InputTextArea id="text" class="form-control" rows="20" @bind-Value="blogPost.Text"></InputTextArea>
-            </div>
-
-            <button class="btn btn-dark" type="submit">Submit</button>
-        </EditForm>
-
-        @if (blogPostAlreadyExists)
-        {
-            <button class="btn btn-danger" type="button" @onclick="OnDeleteButtonClicked">Delete</button>
         }
     </div>
 </div>
@@ -97,8 +100,9 @@
 </Sidebar>
 
 @code {
-    private BlogPostEntity blogPost { get; set; } = new BlogPostEntity("title", "author", "...");
+    private BlogPostEntity blogPost { get; set; }
     private bool blogPostAlreadyExists { get; set; } = false;
+    private bool hasInitialized { get; set; } = false;
 
     private async Task OnValidSubmit()
     {
@@ -144,7 +148,12 @@
         }
         else
         {
-            blogPost.Author = (await authStateProvider.GetAuthenticationStateAsync()).User.Identity.Name;
+            blogPost = new BlogPostEntity(
+                (await authStateProvider.GetAuthenticationStateAsync()).User, 
+                "title", 
+                "...");
         }
+
+        hasInitialized = true;
     }
 }

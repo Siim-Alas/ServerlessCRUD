@@ -2,18 +2,17 @@
 using ServerlessCrudClassLibrary;
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Net.Http;
 using System.Net.Http.Json;
 using System.Threading.Tasks;
 
 namespace ServerlessCrudBlazorUI.Services
 {
-    public class UnauthorizedCrudFunctionAPIClient
+    public class AnnonymousCrudFunctionAPIClient
     {
         private readonly HttpClient _client;
 
-        public UnauthorizedCrudFunctionAPIClient(HttpClient client)
+        public AnnonymousCrudFunctionAPIClient(HttpClient client)
         {
             _client = client;
             _client.BaseAddress = new Uri("https://serverlesscrud.azurewebsites.net/api/");
@@ -56,7 +55,7 @@ namespace ServerlessCrudBlazorUI.Services
             }
             catch
             {
-                return new BlogPostEntity("Error", "Blazor Bot", "Something has gone wrong processing your request.");
+                return null;
             }
         }
     }

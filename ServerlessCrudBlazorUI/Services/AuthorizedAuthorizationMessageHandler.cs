@@ -3,9 +3,9 @@ using Microsoft.AspNetCore.Components.WebAssembly.Authentication;
 
 namespace ServerlessCrudBlazorUI.Services
 {
-    public class CustomAuthorizationMessageHandler : AuthorizationMessageHandler
+    public class AuthorizedAuthorizationMessageHandler : AuthorizationMessageHandler
     {
-        public CustomAuthorizationMessageHandler(
+        public AuthorizedAuthorizationMessageHandler(
             IAccessTokenProvider provider,
             NavigationManager navigationManager)
             : base(provider, navigationManager)

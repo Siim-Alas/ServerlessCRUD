@@ -39,9 +39,13 @@ namespace ServerlessCrudFunctions
                 {
                     return new BadRequestErrorMessageResult("The BlogPost.IsValid check failed.");
                 }
-                else if (blogPost.Author != (await _jwtService.GetClaimsPrincipalAsync(req))
-                    .Claims.Where(claim => claim.Type == "name").First().Value)
+                else if (
+                    ((await _jwtService.GetClaimsPrincipalAsync(req))
+                    .Claims.Where(c => c.Type == "http://schemas.microsoft.com/identity/claims/objectidentifier")
+                    .First().Value != blogPost.AuthorOID) || 
+                    string.IsNullOrEmpty(blogPost.AuthorOID))
                 {
+                    // "oid" claim is invalid.
                     return new UnauthorizedResult();
                 }
 

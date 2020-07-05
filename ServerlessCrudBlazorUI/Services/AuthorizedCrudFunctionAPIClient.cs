@@ -1,12 +1,8 @@
-﻿using Newtonsoft.Json;
-using ServerlessCrudClassLibrary;
+﻿using ServerlessCrudClassLibrary;
 using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Net.Http;
 using System.Net.Http.Json;
 using System.Threading.Tasks;
-using System.Web;
 
 namespace ServerlessCrudBlazorUI.Services
 {

@@ -1,44 +1,51 @@
 ﻿@page "/detail/{dateString}/{rowKey}"
 
+@using System.Security.Claims
 @using ServerlessCrudClassLibrary
 @using ServerlessCrudBlazorUI.Services
 
-@inject UnauthorizedCrudFunctionAPIClient client
+@inject AnnonymousCrudFunctionAPIClient client
 @inject AuthenticationStateProvider authStateProvider
 
 <div class="main mb-4">
     <div class="content pl-4 pb-4">
-        <div>
-            <h3>
-                @blogPost.Title
-            </h3>
-            <p>
-                <small>By @blogPost.Author &mdash; Last updated: @blogPost.Timestamp.ToLocalTime().ToString("hh:mm d MMMM yyyy")</small>
-            </p>
-        </div>
-        <div>
-            @try
-            {
-                <div class="multiline">@PrettyPrinter.ParseMarkdownToHTML(blogPost.Text)</div>
-            }
-            catch (ArgumentException)
-            {
-                <div class="multiline">@blogPost.Text</div>
-            }
-        </div>
-        @if (userName == blogPost.Author)
+        @if (hasLoaded)
         {
-            <NavLink href="@($"/editor?partitionkey={PrettyPrinter.BlogPostPartitionKeyFromDateString(DateString)}&rowkey={RowKey}")">Edit</NavLink>
+            <div>
+                <h3>
+                    @blogPost.Title
+                </h3>
+                <p>
+                    <small>By @blogPost.Author &mdash; Last updated: @blogPost.Timestamp.ToLocalTime().ToString("hh:mm d MMMM yyyy")</small>
+                </p>
+            </div>
+            <div>
+                @try
+                {
+                    <div class="multiline">@PrettyPrinter.ParseMarkdownToHTML(blogPost.Text)</div>
+                }
+                catch (ArgumentException)
+                {
+                    <div class="multiline">@blogPost.Text</div>
+                }
+            </div>
+            @if (userOID == blogPost.AuthorOID)
+            {
+                <NavLink href="@($"/editor?partitionkey={PrettyPrinter.BlogPostPartitionKeyFromDateString(DateString)}&rowkey={RowKey}")">Edit</NavLink>
+            }
         }
     </div>
 </div>
 <Sidebar>
-    <h4>About @blogPost.Author</h4>
-    <p>
-        Vivamus id lectus lorem. Curabitur varius lectus mattis, 
-        venenatis mauris tristique, porttitor nulla. Nam et scelerisque sem, 
-        vitae eleifend mi. Proin tincidunt eros non nisi viverra fringilla.
-    </p>
+    @if (hasLoaded)
+    {
+        <h4>About @blogPost.Author</h4>
+        <p>
+            Vivamus id lectus lorem. Curabitur varius lectus mattis,
+            venenatis mauris tristique, porttitor nulla. Nam et scelerisque sem,
+            vitae eleifend mi. Proin tincidunt eros non nisi viverra fringilla.
+        </p>
+    }
 </Sidebar>
 
 @code {
@@ -47,14 +54,17 @@
     [Parameter]
     public string RowKey { get; set; }
 
-    private string userName;
-    private BlogPostEntity blogPost { get; set; } = new BlogPostEntity("", "");
+    private ClaimsPrincipal user { get; set; }
+    private BlogPostEntity blogPost { get; set; }
+    private bool hasLoaded { get; set; } = false;
+    private string userOID { get; set; }
 
     protected override async Task OnInitializedAsync()
     {
         await base.OnInitializedAsync();
 
-        userName = (await authStateProvider.GetAuthenticationStateAsync()).User.Identity.Name;
+        user = (await authStateProvider.GetAuthenticationStateAsync()).User;
+        userOID = user.Identity.IsAuthenticated ? user.Claims.Where(claim => claim.Type == "oid").First().Value : "";
     }
 
     protected override async Task OnParametersSetAsync()
@@ -64,5 +74,7 @@
         blogPost = await client.GetBlogPostEntityAsync(
             PrettyPrinter.BlogPostPartitionKeyFromDateString(DateString),
             RowKey);
+
+        hasLoaded = true;
     }
 }
