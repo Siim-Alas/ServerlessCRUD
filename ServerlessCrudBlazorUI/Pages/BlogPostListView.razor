@@ -2,6 +2,7 @@
 
 @using ServerlessCrudClassLibrary
 @using ServerlessCrudBlazorUI.Services
+@using ServerlessCrudBlazorUI.Services.APIClients
 
 @inject AnnonymousCrudFunctionAPIClient client
 
@@ -104,7 +105,7 @@
                         "Timestamp",
                         "Author",
                         "Text"
-                        },
+                            },
                     takeCount: numberOfEntitiesOnPage,
                     nextKeys: catalog[i * numberOfEntitiesOnPage]
                 )).BlogPosts.ToArray();
@@ -122,7 +123,7 @@
                        {
                            "PartitionKey",
                            "RowKey"
-                               })).BlogPosts
+                                   })).BlogPosts
                    select (post.PartitionKey, post.RowKey))
                    .ToArray();
 

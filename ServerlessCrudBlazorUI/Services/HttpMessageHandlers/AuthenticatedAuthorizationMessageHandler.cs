@@ -1,7 +1,7 @@
 ﻿using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.WebAssembly.Authentication;
 
-namespace ServerlessCrudBlazorUI.Services
+namespace ServerlessCrudBlazorUI.Services.HttpMessageHandlers
 {
     public class AuthenticatedAuthorizationMessageHandler : AuthorizationMessageHandler
     {

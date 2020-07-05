@@ -13,14 +13,14 @@ using System.Web.Http;
 
 namespace ServerlessCrudFunctions
 {
-    public class QueryBlogPostEntities
+    public class QueryBlogPosts
     {
-        public QueryBlogPostEntities()
+        public QueryBlogPosts()
         {
             
         }
 
-        [FunctionName("QueryBlogPostEntities")]
+        [FunctionName("QueryBlogPosts")]
         public async Task<IActionResult> Run(
             [HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = null)] HttpRequest req,
             [Table("blogposts", "AzureWebJobsStorage")] CloudTable table,
@@ -77,7 +77,7 @@ namespace ServerlessCrudFunctions
             }
             catch (Exception e)
             {
-                log.LogError($"function QueryBlogPostEntities -- caught exception {e} {e.Message} {e.StackTrace}");
+                log.LogError($"function QueryBlogPosts -- caught exception {e} {e.Message} {e.StackTrace}");
                 return new InternalServerErrorResult();
             }
         }

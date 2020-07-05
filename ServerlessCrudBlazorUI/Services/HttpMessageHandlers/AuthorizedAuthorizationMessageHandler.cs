@@ -1,7 +1,7 @@
 ﻿using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.WebAssembly.Authentication;
 
-namespace ServerlessCrudBlazorUI.Services
+namespace ServerlessCrudBlazorUI.Services.HttpMessageHandlers
 {
     public class AuthorizedAuthorizationMessageHandler : AuthorizationMessageHandler
     {
@@ -12,8 +12,8 @@ namespace ServerlessCrudBlazorUI.Services
         {
             ConfigureHandler(
                 authorizedUrls: new[] { "https://serverlesscrud.azurewebsites.net" },
-                scopes: new[] 
-                { 
+                scopes: new[]
+                {
                     "db944478-cbda-4214-8ad6-7b310465ce97/BlogPosts.Read",
                     "db944478-cbda-4214-8ad6-7b310465ce97/BlogPosts.Write",
                     "db944478-cbda-4214-8ad6-7b310465ce97/Comments.Read",

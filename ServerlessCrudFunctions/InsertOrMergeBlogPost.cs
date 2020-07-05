@@ -14,16 +14,16 @@ using System.Linq;
 
 namespace ServerlessCrudFunctions
 {
-    public class InsertOrMergeBlogPostEntity
+    public class InsertOrMergeBlogPost
     {
         private readonly JwtService _jwtService;
 
-        public InsertOrMergeBlogPostEntity(JwtService service)
+        public InsertOrMergeBlogPost(JwtService service)
         {
             _jwtService = service;
         }
 
-        [FunctionName("InsertOrMergeBlogPostEntity")]
+        [FunctionName("InsertOrMergeBlogPost")]
         public async Task<IActionResult> Run(
             [HttpTrigger(AuthorizationLevel.Anonymous, "post", Route = null)] HttpRequest req,
             [Table("blogposts", "AzureWebJobsStorage")] CloudTable table,
@@ -37,7 +37,7 @@ namespace ServerlessCrudFunctions
 
                 if (!blogPost.IsValid)
                 {
-                    return new BadRequestErrorMessageResult("The BlogPost.IsValid check failed.");
+                    return new BadRequestErrorMessageResult("The BlogPostEntity.IsValid check failed.");
                 }
                 else if (
                     ((await _jwtService.GetClaimsPrincipalAsync(req))
@@ -56,7 +56,7 @@ namespace ServerlessCrudFunctions
             }
             catch (Exception e)
             {
-                log.LogError($"function InsertOrMergeBlogPostEntity -- caught exception {e} {e.Message} {e.StackTrace}");
+                log.LogError($"function InsertOrMergeBlogPost -- caught exception {e} {e.Message} {e.StackTrace}");
                 return new InternalServerErrorResult();
             }
         }

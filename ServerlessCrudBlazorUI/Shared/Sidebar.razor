@@ -1,5 +1,6 @@
 ﻿@using ServerlessCrudClassLibrary
 @using ServerlessCrudBlazorUI.Services
+@using ServerlessCrudBlazorUI.Services.APIClients
 
 @inject AnnonymousCrudFunctionAPIClient client
 
@@ -45,7 +46,7 @@
                 "RowKey",
                 "Timestamp",
                 "Author"
-            });
+                });
 
         hasInitialized = true;
     }

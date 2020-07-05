@@ -5,6 +5,7 @@
 @using System.Security.Claims
 @using ServerlessCrudClassLibrary
 @using ServerlessCrudBlazorUI.Services
+@using ServerlessCrudBlazorUI.Services.APIClients
 
 @inject AuthorizedCrudFunctionAPIClient authorizedClient
 @inject AnnonymousCrudFunctionAPIClient unauthorizedClient
@@ -149,8 +150,8 @@
         else
         {
             blogPost = new BlogPostEntity(
-                (await authStateProvider.GetAuthenticationStateAsync()).User, 
-                "title", 
+                (await authStateProvider.GetAuthenticationStateAsync()).User,
+                "title",
                 "...");
         }
 

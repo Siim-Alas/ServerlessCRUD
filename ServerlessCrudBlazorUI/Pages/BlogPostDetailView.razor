@@ -3,6 +3,7 @@
 @using System.Security.Claims
 @using ServerlessCrudClassLibrary
 @using ServerlessCrudBlazorUI.Services
+@using ServerlessCrudBlazorUI.Services.APIClients
 
 @inject AnnonymousCrudFunctionAPIClient client
 @inject AuthenticationStateProvider authStateProvider
@@ -33,6 +34,7 @@
             {
                 <NavLink href="@($"/editor?partitionkey={PrettyPrinter.BlogPostPartitionKeyFromDateString(DateString)}&rowkey={RowKey}")">Edit</NavLink>
             }
+            <CommentSection BlogPost="blogPost" Commenter="user"></CommentSection>
         }
     </div>
 </div>

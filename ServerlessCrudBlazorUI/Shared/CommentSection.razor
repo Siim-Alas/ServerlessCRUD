@@ -1,5 +1,69 @@
-﻿<h3>CommentSection</h3>
+﻿@using ServerlessCrudClassLibrary
+@using System.Security.Claims
+@using ServerlessCrudBlazorUI.Services.APIClients
+
+@inject AnnonymousCrudFunctionAPIClient annonymousClient
+@inject AuthenticatedCrudFunctionAPIClient authenticatedClient
+
+<h3>CommentSection</h3>
+
+@if (Commenter.Identity.IsAuthenticated)
+{
+    <EditForm Model="newComment" OnValidSubmit="OnValidSubmit">
+        <DataAnnotationsValidator />
+        <ValidationSummary />
+        <div class="form-group">
+            <label for="text">Text</label>
+            <InputTextArea id="text" class="form-control" rows="3" @bind-Value="newComment.Text"></InputTextArea>
+        </div>
+
+        <button class="btn btn-dark" type="submit">Submit</button>
+    </EditForm>
+}
+
+<ul>
+    @if (hasLoaded)
+    {
+        foreach (CommentEntity comment in comments)
+        {
+            <li>@comment.Text</li>
+        }
+    }
+</ul>
 
 @code {
+    [Parameter]
+    public BlogPostEntity BlogPost { get; set; }
+    [Parameter]
+    public ClaimsPrincipal Commenter { get; set; }
 
+    private CommentEntity newComment { get; set; }
+    private CommentEntity[] comments { get; set; }
+    private bool hasLoaded { get; set; } = false;
+
+    private async Task OnValidSubmit()
+    {
+        if (newComment.IsValid)
+        {
+            await authenticatedClient.PostCommentEntityAsync(newComment);
+        }
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        await base.OnInitializedAsync();
+
+        if (Commenter.Identity.IsAuthenticated)
+        {
+            newComment = new CommentEntity(BlogPost, Commenter, "...");
+        }
+    }
+
+    protected override async Task OnParametersSetAsync()
+    {
+        await base.OnParametersSetAsync();
+
+        comments = (await annonymousClient.GetCommentsOnBlogPost(BlogPost)) ?? new CommentEntity[0];
+        hasLoaded = true;
+    }
 }

@@ -11,34 +11,32 @@ using ServerlessCrudClassLibrary;
 
 namespace ServerlessCrudFunctions
 {
-    public class ReadBlogPostEntity
+    public class GetBlogPost
     {
-        public ReadBlogPostEntity()
+        public GetBlogPost()
         {
 
         }
 
-        [FunctionName("ReadBlogPostEntity")]
+        [FunctionName("GetBlogPost")]
         public async Task<IActionResult> Run(
             [HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = null)] HttpRequest req,
             [Table("blogposts", "AzureWebJobsStorage")] CloudTable table,
             ILogger log)
         {
-            log.LogInformation("function ReadBlogPostEntity -- started processing request.");
-
             try
             {
                 TableResult result = await table.ExecuteAsync(TableOperation.Retrieve<BlogPostEntity>(
                     req.Query["partitionkey"], 
                     req.Query["rowkey"]));
 
-                log.LogInformation($"function ReadBlogPostEntity -- got response '{result.HttpStatusCode}' from table '{table.Name}'.");
+                log.LogInformation($"function GetBlogPost -- got response '{result.HttpStatusCode}' from table '{table.Name}'.");
 
                 return new OkObjectResult(result.Result);
             }
             catch (Exception e)
             {
-                log.LogError($"function ReadBlogPostEntity -- caught exception {e} {e.Message} {e.StackTrace}");
+                log.LogError($"function GetBlogPost -- caught exception {e} {e.Message} {e.StackTrace}");
                 return new InternalServerErrorResult();
             }
         }

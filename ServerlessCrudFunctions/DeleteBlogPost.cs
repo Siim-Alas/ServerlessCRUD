@@ -14,16 +14,16 @@ using System.Linq;
 
 namespace ServerlessCrudFunctions
 {
-    public class DeleteBlogPostEntity
+    public class DeleteBlogPost
     {
         private readonly JwtService _jwtService;
 
-        public DeleteBlogPostEntity(JwtService service)
+        public DeleteBlogPost(JwtService service)
         {
             _jwtService = service;
         }
 
-        [FunctionName("DeleteBlogPostEntity")]
+        [FunctionName("DeleteBlogPost")]
         public async Task<IActionResult> Run(
             [HttpTrigger(AuthorizationLevel.Anonymous, "post", Route = null)] HttpRequest req,
             [Table("blogposts", "AzureWebJobsStorage")] CloudTable table,
@@ -56,7 +56,7 @@ namespace ServerlessCrudFunctions
             }
             catch (Exception e)
             {
-                log.LogError($"function DeleteBlogPostEntity -- caught exception {e} {e.Message} {e.StackTrace}");
+                log.LogError($"function DeleteBlogPost -- caught exception {e} {e.Message} {e.StackTrace}");
                 return new InternalServerErrorResult();
             }
         }

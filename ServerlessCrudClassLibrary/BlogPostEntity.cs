@@ -28,7 +28,7 @@ namespace ServerlessCrudClassLibrary
             Text = text;
         }
         /// <summary>
-        /// Gets or sets the display for the author of the post.
+        /// Gets or sets the display name for the author of the post.
         /// </summary>
         [Required]
         public string Author { get; set; }
@@ -64,7 +64,7 @@ namespace ServerlessCrudClassLibrary
             set { SetRowKey(AuthorOID, value); }
         }
         /// <summary>
-        /// Checks if the PartitionKey and RowKey values are valid and that Timestamp and Text are not null.
+        /// Checks if the PartitionKey and RowKey values are valid and that Timestamp, Author, and Text are not null.
         /// </summary>
         [IgnoreProperty]
         [JsonIgnore]
@@ -75,15 +75,15 @@ namespace ServerlessCrudClassLibrary
                 return 
                     Regex.IsMatch(PartitionKey, @"^[0-9]{6}$") && 
                     Regex.IsMatch(RowKey, @"^[0-9]{19}_[0-9a-f]{8}(-[0-9a-f]{4}){3}-[0-9a-f]{12}_.+$") && 
-                    Timestamp != null &&
-                    Author != null &&
-                    Text != null;
+                    (Timestamp != null) &&
+                    (Author != null) &&
+                    (Text != null);
             }
         }
         /// <summary>
         /// Sets the RowKey in the format (REVERSETICKS_AUTHOROID_TITLE).
         /// </summary>
-        /// <param name="authorOID">The author to oid (GUID of the user object) to be saved in RowKey.</param>
+        /// <param name="authorOID">The oid of the author (GUID of the user object), to be saved in RowKey.</param>
         /// <param name="title">The title to be saved in RowKey.</param>
         private void SetRowKey(string authorOID, string title)
         {
@@ -91,18 +91,6 @@ namespace ServerlessCrudClassLibrary
                     RowKey?.Substring(0, 19) ?? (DateTime.MaxValue.Ticks - DateTime.UtcNow.Ticks).ToString("d19"),
                     RowKey?.Substring(20, 36) ?? authorOID,
                     title);
-        }
-        public BlogPostEntity Clone()
-        {
-            return new BlogPostEntity() 
-            { 
-                PartitionKey = PartitionKey, 
-                RowKey = RowKey, 
-                Timestamp = Timestamp,
-                ETag = ETag,
-                Author = Author,
-                Text = Text
-            };
         }
     }
 }

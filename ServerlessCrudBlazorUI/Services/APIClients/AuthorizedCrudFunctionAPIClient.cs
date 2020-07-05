@@ -4,7 +4,7 @@ using System.Net.Http;
 using System.Net.Http.Json;
 using System.Threading.Tasks;
 
-namespace ServerlessCrudBlazorUI.Services
+namespace ServerlessCrudBlazorUI.Services.APIClients
 {
     public class AuthorizedCrudFunctionAPIClient
     {
@@ -21,7 +21,7 @@ namespace ServerlessCrudBlazorUI.Services
             try
             {
                 return await _client.PostAsJsonAsync(
-                    "InsertOrMergeBlogPostEntity",
+                    "InsertOrMergeBlogPost",
                     blogPost);
             }
             catch (Exception e)
@@ -36,7 +36,7 @@ namespace ServerlessCrudBlazorUI.Services
             try
             {
                 return await _client.PostAsJsonAsync(
-                    "DeleteBlogPostEntity",
+                    "DeleteBlogPost",
                     blogPost);
             }
             catch

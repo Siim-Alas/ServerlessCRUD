@@ -6,7 +6,7 @@ using System.Net.Http;
 using System.Net.Http.Json;
 using System.Threading.Tasks;
 
-namespace ServerlessCrudBlazorUI.Services
+namespace ServerlessCrudBlazorUI.Services.APIClients
 {
     public class AnnonymousCrudFunctionAPIClient
     {
@@ -19,10 +19,10 @@ namespace ServerlessCrudBlazorUI.Services
         }
 
         public async Task<QueryBlogPostEntitiesResponse> GetQueryBlogPostsResponseAsync(
-            int skip = 0, 
+            int skip = 0,
+            int takeCount = 4,
             string filterString = null,
             IList<string> selectColumns = null,
-            int takeCount = 4,
             (string partitionKey, string rowKey)? nextKeys = null)
             {
             try
@@ -30,7 +30,7 @@ namespace ServerlessCrudBlazorUI.Services
                 // Int default value isn't null so it is assumed to be always included.
                 return await _client.GetFromJsonAsync<QueryBlogPostEntitiesResponse>(
                            string.Format(
-                               "QueryBlogPostEntities?{0}{1}{2}{3}{4}{5}", 
+                               "QueryBlogPosts?{0}{1}{2}{3}{4}{5}", 
                                $"skip={skip}",
                                $"&takecount={takeCount}",
                                (filterString == null) ? "" : $"&filterstring={filterString}",
@@ -51,7 +51,20 @@ namespace ServerlessCrudBlazorUI.Services
             try
             {
                 return await _client.GetFromJsonAsync<BlogPostEntity>(
-                    $"ReadBlogPostEntity?partitionkey={partitionKey}&rowkey={rowKey}");
+                    $"GetBlogPost?partitionkey={partitionKey}&rowkey={rowKey}");
+            }
+            catch
+            {
+                return null;
+            }
+        }
+
+        public async Task<CommentEntity[]> GetCommentsOnBlogPost(BlogPostEntity blogPost)
+        {
+            try
+            {
+                return await _client.GetFromJsonAsync<CommentEntity[]>(
+                    $"GetCommentsOnBlogPost?commentpartitionkey={blogPost.PartitionKey}_{blogPost.RowKey}");
             }
             catch
             {

@@ -2,7 +2,8 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using ServerlessCrudBlazorUI.Services;
+using ServerlessCrudBlazorUI.Services.APIClients;
+using ServerlessCrudBlazorUI.Services.HttpMessageHandlers;
 
 namespace ServerlessCrudBlazorUI
 {
@@ -14,6 +15,7 @@ namespace ServerlessCrudBlazorUI
             builder.RootComponents.Add<App>("app");
 
             builder.Services.AddTransient<AuthorizedAuthorizationMessageHandler>();
+            builder.Services.AddTransient<AuthenticatedAuthorizationMessageHandler>();
 
             builder.Services.AddHttpClient<AuthorizedCrudFunctionAPIClient>()
                 .AddHttpMessageHandler<AuthorizedAuthorizationMessageHandler>();
