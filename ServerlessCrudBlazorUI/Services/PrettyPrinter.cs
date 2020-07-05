@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Web;
 
 namespace ServerlessCrudBlazorUI.Services
 {
@@ -20,7 +21,7 @@ namespace ServerlessCrudBlazorUI.Services
             Heading4,
             Link,
             Image,
-            BlockQuote,
+            // Blockquotes are not supported.
             // Unordered lists not supported.
             // Ordered lists not supported.
             HorizontalRule,
@@ -38,7 +39,7 @@ namespace ServerlessCrudBlazorUI.Services
                 { "## ", MdEnum.Heading4 },
                 { "](", MdEnum.Link },
                 { "![Image](", MdEnum.Image }, 
-                { "> ", MdEnum.BlockQuote },
+                // Blockquotes are not supported.
                 // Unordered lists not supported.
                 // Ordered lists not supported.
                 { "---", MdEnum.HorizontalRule },
@@ -56,7 +57,7 @@ namespace ServerlessCrudBlazorUI.Services
                 { MdEnum.Heading4, "\n" },
                 { MdEnum.Link, ")" },
                 { MdEnum.Image, ")" },
-                { MdEnum.BlockQuote, "\n" },
+                // Blockquotes are not supported.
                 // Unordered lists not supported.
                 // Ordered lists not supported.
                 { MdEnum.HorizontalRule, "\n" },
@@ -74,7 +75,7 @@ namespace ServerlessCrudBlazorUI.Services
                 { MdEnum.Heading4, ("<h4>", "</h4>") },
                 { MdEnum.Link, ("<a target=\"_blank\" href=\"", "</a>") },
                 { MdEnum.Image, ("<img src=\"", "\"/>") },
-                { MdEnum.BlockQuote, ("<blockquote class=\"blockquote\">", "</blockquote>") },
+                // Blockquotes are not supported.
                 // Unordered lists not supported.
                 // Ordered lists not supported.
                 { MdEnum.HorizontalRule, ("<hr />", "") },
@@ -108,6 +109,7 @@ namespace ServerlessCrudBlazorUI.Services
         /// <returns>The raw HTML from said markdown string.</returns>
         public static MarkupString ParseMarkdownToHTML(string markdown)
         {
+            markdown = HttpUtility.HtmlEncode(markdown);
             Stack<MdEnum> mdStack = new Stack<MdEnum>();
             StringBuilder rawHTMLBuilder = new StringBuilder();
 
