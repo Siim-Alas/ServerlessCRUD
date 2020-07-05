@@ -103,6 +103,10 @@ app {
     margin: 50px auto;
 }
 
+.comment-section {
+    margin-top: 50px;
+}
+
 .sidebar {
     background-color: #f1f1f1;
     width: 25vw;

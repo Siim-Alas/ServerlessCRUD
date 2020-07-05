@@ -5,31 +5,41 @@
 @inject AnnonymousCrudFunctionAPIClient annonymousClient
 @inject AuthenticatedCrudFunctionAPIClient authenticatedClient
 
-<h3>CommentSection</h3>
+<div class="comment-section">
+    <h4>Comments</h4>
+    <ul class="list-group">
+        <li class="list-group-item">
+            @if (Commenter.Identity.IsAuthenticated)
+            {
+                <EditForm Model="newComment" OnValidSubmit="OnValidSubmit">
+                    <DataAnnotationsValidator />
+                    <ValidationSummary />
+                    <div class="form-group">
+                        <label for="text">Text</label>
+                        <InputTextArea id="text" class="form-control" rows="3" @bind-Value="newComment.Text"></InputTextArea>
+                    </div>
 
-@if (Commenter.Identity.IsAuthenticated)
-{
-    <EditForm Model="newComment" OnValidSubmit="OnValidSubmit">
-        <DataAnnotationsValidator />
-        <ValidationSummary />
-        <div class="form-group">
-            <label for="text">Text</label>
-            <InputTextArea id="text" class="form-control" rows="3" @bind-Value="newComment.Text"></InputTextArea>
-        </div>
-
-        <button class="btn btn-dark" type="submit">Submit</button>
-    </EditForm>
-}
-
-<ul>
-    @if (hasLoaded)
-    {
-        foreach (CommentEntity comment in comments)
+                    <button class="btn btn-dark" type="submit">Comment</button>
+                </EditForm>
+            }
+            else
+            {
+                <p>Sign in to comment.</p>
+            }
+        </li>
+        @if (hasLoaded)
         {
-            <li>@comment.Text</li>
+            foreach (CommentEntity comment in comments)
+            {
+                <li class="list-group-item">
+                    <h6>@comment.Author</h6>
+                    <p class="text-muted">Posted on @comment.Timestamp.ToLocalTime().ToString("HH:mm d MMMM yyyy")</p>
+                    <p class="multiline">@comment.Text</p>
+                </li>
+            }
         }
-    }
-</ul>
+    </ul>
+</div>
 
 @code {
     [Parameter]
@@ -43,9 +53,11 @@
 
     private async Task OnValidSubmit()
     {
-        if (newComment.IsValid)
+        if (newComment.IsValid && Commenter.Identity.IsAuthenticated)
         {
             await authenticatedClient.PostCommentEntityAsync(newComment);
+            newComment = new CommentEntity(BlogPost, Commenter, "...");
+            await this.OnParametersSetAsync();
         }
     }
 
