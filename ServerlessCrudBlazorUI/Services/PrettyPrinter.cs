@@ -205,6 +205,11 @@ namespace ServerlessCrudBlazorUI.Services
                 i++;
             }
 
+            if (mdStack.Count > 0)
+            {
+                throw new ArgumentException("The markdown provided was not formatted correctly.");
+            }
+
             return (MarkupString)rawHTMLBuilder.ToString();
         }
     }

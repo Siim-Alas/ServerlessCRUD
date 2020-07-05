@@ -17,7 +17,14 @@
             </p>
         </div>
         <div>
-            <div class="multiline">@PrettyPrinter.ParseMarkdownToHTML(blogPost.Text)</div>
+            @try
+            {
+                <div class="multiline">@PrettyPrinter.ParseMarkdownToHTML(blogPost.Text)</div>
+            }
+            catch (ArgumentException)
+            {
+                <div class="multiline">@blogPost.Text</div>
+            }
         </div>
         @if (userName == blogPost.Author)
         {

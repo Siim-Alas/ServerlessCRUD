@@ -65,7 +65,7 @@
                 <td>@PrettyPrinter.ParseMarkdownToHTML("__bold__")</td>
             </tr>
             <tr>
-                <td>*__super important__* or any combination of the two</td>
+                <td>*__super important__* <small>or any combination of the two</small></td>
                 <td>@PrettyPrinter.ParseMarkdownToHTML("___super important___")</td>
             </tr>
             <tr>
@@ -85,8 +85,8 @@
                 <td>@PrettyPrinter.ParseMarkdownToHTML("![Image](favicon.ico)")</td>
             </tr>
             <tr>
-                <td>---</td>
-                <td>@PrettyPrinter.ParseMarkdownToHTML("---")</td>
+                <td>---\n</td>
+                <td>@PrettyPrinter.ParseMarkdownToHTML("---\n")</td>
             </tr>
             <tr>
                 <td>`code`</td>
