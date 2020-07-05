@@ -15,8 +15,10 @@ namespace ServerlessCrudBlazorUI.Services
         /// </summary>
         private enum MdEnum
         {
-            Italic,
-            Bold,
+            Italic1,
+            Italic2,
+            Bold1,
+            Bold2,
             Heading3,
             Heading4,
             Link,
@@ -33,8 +35,10 @@ namespace ServerlessCrudBlazorUI.Services
         private static readonly Dictionary<string, MdEnum> openingMdStrings = 
             new Dictionary<string, MdEnum>() 
             {
-                { "*", MdEnum.Italic },
-                { "**", MdEnum.Bold }, 
+                { "*", MdEnum.Italic1 },
+                { "_", MdEnum.Italic2 },
+                { "**", MdEnum.Bold1 },
+                { "__", MdEnum.Bold2 },
                 { "# ", MdEnum.Heading3 }, 
                 { "## ", MdEnum.Heading4 },
                 { "](", MdEnum.Link },
@@ -51,8 +55,10 @@ namespace ServerlessCrudBlazorUI.Services
         private static readonly Dictionary<MdEnum, string> closingMdStrings =
             new Dictionary<MdEnum, string>()
             {
-                { MdEnum.Italic, "*" },
-                { MdEnum.Bold, "**" },
+                { MdEnum.Italic1, "*" },
+                { MdEnum.Italic2, "_" },
+                { MdEnum.Bold1, "**" },
+                { MdEnum.Bold2, "__" },
                 { MdEnum.Heading3, "\n" },
                 { MdEnum.Heading4, "\n" },
                 { MdEnum.Link, ")" },
@@ -69,8 +75,10 @@ namespace ServerlessCrudBlazorUI.Services
         private static readonly Dictionary<MdEnum, (string opening, string closing)> htmlTags =
             new Dictionary<MdEnum, (string, string)>()
             {
-                { MdEnum.Italic, ("<i>", "</i>") },
-                { MdEnum.Bold, ("<b>", "</b>") },
+                { MdEnum.Italic1, ("<i>", "</i>") },
+                { MdEnum.Italic2, ("<i>", "</i>") },
+                { MdEnum.Bold1, ("<b>", "</b>") },
+                { MdEnum.Bold2, ("<b>", "</b>") },
                 { MdEnum.Heading3, ("<h3>", "</h3>") },
                 { MdEnum.Heading4, ("<h4>", "</h4>") },
                 { MdEnum.Link, ("<a target=\"_blank\" href=\"", "</a>") },
@@ -103,7 +111,7 @@ namespace ServerlessCrudBlazorUI.Services
             return $"{9999 - Convert.ToInt32(dateString.Substring(0, 4)):d4}{99 - Convert.ToInt32(dateString.Substring(5, 2)):d2}";
         }
         /// <summary>
-        /// Parses a markdown (all listed <see href="https://commonmark.org/help/">here</see> under "Type") string into raw HTML.
+        /// Parses a markdown (see <see href="https://commonmark.org/help/">here</see>) string into raw HTML.
         /// </summary>
         /// <param name="markdown">The markdown string.</param>
         /// <returns>The raw HTML from said markdown string.</returns>

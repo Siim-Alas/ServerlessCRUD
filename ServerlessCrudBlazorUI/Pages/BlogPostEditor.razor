@@ -57,12 +57,16 @@
         </thead>
         <tbody>
             <tr>
-                <td>*italic*</td>
-                <td>@PrettyPrinter.ParseMarkdownToHTML("*italic*")</td>
+                <td>*italic* or _italic_</td>
+                <td>@PrettyPrinter.ParseMarkdownToHTML("_italic_")</td>
             </tr>
             <tr>
-                <td>**bold**</td>
-                <td>@PrettyPrinter.ParseMarkdownToHTML("**bold**")</td>
+                <td>**bold** or __bold__</td>
+                <td>@PrettyPrinter.ParseMarkdownToHTML("__bold__")</td>
+            </tr>
+            <tr>
+                <td>*__super important__* or any combination of the two</td>
+                <td>@PrettyPrinter.ParseMarkdownToHTML("___super important___")</td>
             </tr>
             <tr>
                 <td># Heading 1\n</td>
