@@ -12,6 +12,7 @@
 
         @if (hasInitialized)
         {
+            <BlogPostSearch Catalog="catalog" />
             <ul class="list-group">
                 @foreach (BlogPostEntity post in blogPosts[index])
                 {

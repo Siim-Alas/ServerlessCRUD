@@ -1,0 +1,34 @@
+﻿@using ServerlessCrudBlazorUI.Services
+
+<select class="form-control" @bind="SelectedPartitionKey">
+    @foreach (string pk in Catalog.Select(post => post.PartitionKey).Distinct())
+    {
+        <option value="@pk">@PrettyPrinter.DateStringFromBlogPostPartitionKey(pk)</option>
+    }
+</select>
+<input type="text" @bind="SearchText" @bind:event="oninput" />
+
+@if (Results != null)
+{
+    <ul>
+        @foreach ((string partitionKey, string rowKey) result in Results)
+        {
+            <li>@result.rowKey</li>
+        }
+    </ul>
+}
+
+@code {
+    [Parameter]
+    public (string PartitionKey, string RowKey)[] Catalog { get; set; }
+
+    private string SelectedPartitionKey { get; set; }
+    private string SearchText { get; set; }
+    private IEnumerable<(string partitionKey, string rowKey)> Results
+    {
+        get { return Catalog
+            .Where(post => post.PartitionKey == SelectedPartitionKey)
+            .Where(post => post.RowKey.Contains(SearchText ?? "", StringComparison.InvariantCultureIgnoreCase));
+        }
+    }
+}

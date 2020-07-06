@@ -32,7 +32,7 @@
             foreach (CommentEntity comment in comments)
             {
                 <li class="list-group-item">
-                    <h6>@comment.Author</h6>
+                    <b>@comment.Author</b>
                     <p class="text-muted">Posted on @comment.Timestamp.ToLocalTime().ToString("HH:mm d MMMM yyyy")</p>
                     <p class="multiline">@comment.Text</p>
                 </li>
