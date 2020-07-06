@@ -41,8 +41,7 @@ namespace ServerlessCrudFunctions
                 }
                 else if (
                     ((await _jwtService.GetClaimsPrincipalAsync(req))
-                    .Claims.Where(c => c.Type == "http://schemas.microsoft.com/identity/claims/objectidentifier")
-                    .First().Value != blogPost.AuthorOID) ||
+                    .FindFirst("http://schemas.microsoft.com/identity/claims/objectidentifier").Value != blogPost.AuthorOID) ||
                     string.IsNullOrEmpty(blogPost.AuthorOID))
                 {
                     // "oid" claim is invalid.

@@ -1,17 +1,13 @@
 using System;
-using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Azure.WebJobs;
 using Microsoft.Azure.WebJobs.Extensions.Http;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
-using Newtonsoft.Json;
 using System.Web.Http;
 using Microsoft.Azure.Cosmos.Table;
 using ServerlessCrudClassLibrary;
-using Microsoft.Azure.Cosmos.Table.Queryable;
-using System.Collections.Generic;
 
 namespace ServerlessCrudFunctions
 {
@@ -30,16 +26,8 @@ namespace ServerlessCrudFunctions
         {
             try
             {
-                //TableQuery<CommentEntity> commentQuery = table.CreateQuery<CommentEntity>();
-                //TableQuery<CommentEntity> query = (from comment in commentQuery
-                //                                   where comment.PartitionKey == req.Query["commentpartitionkey"]
-                //                                   select comment).AsTableQuery();
-
-                // Large numbers (over 1000) are not expected.
-                //return new OkObjectResult(query.Execute());
-
-                TableQuerySegment<BlogPostEntity> result = await table.ExecuteQuerySegmentedAsync(
-                    new TableQuery<BlogPostEntity>().Where(
+                TableQuerySegment<CommentEntity> result = await table.ExecuteQuerySegmentedAsync(
+                    new TableQuery<CommentEntity>().Where(
                         TableQuery.GenerateFilterCondition(
                             "PartitionKey", 
                             QueryComparisons.Equal, 
