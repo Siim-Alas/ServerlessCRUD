@@ -24,7 +24,7 @@ namespace ServerlessCrudClassLibrary
         {
             PartitionKey = $"{blogPost.PartitionKey}_{blogPost.RowKey}";
             SetRowKey(
-                author.Claims.Where(claim => claim.Type == "oid").First().Value, 
+                author.FindFirst("oid").Value, 
                 author.Identity.Name);
             Text = text;
         }

@@ -23,7 +23,7 @@ namespace ServerlessCrudClassLibrary
         public BlogPostEntity(ClaimsPrincipal author, string title, string text)
         {
             PartitionKey = $"{9999 - DateTime.UtcNow.Year}{99 - DateTime.UtcNow.Month}";
-            SetRowKey(author.Claims.Where(claim => claim.Type == "oid").First().Value, title);
+            SetRowKey(author.FindFirst("oid").Value, title);
             Author = author.Identity.Name;
             Text = text;
         }

@@ -1,21 +1,49 @@
 ﻿@using ServerlessCrudBlazorUI.Services
 
-<select class="form-control" @bind="SelectedPartitionKey">
-    @foreach (string pk in Catalog.Select(post => post.PartitionKey).Distinct())
-    {
-        <option value="@pk">@PrettyPrinter.DateStringFromBlogPostPartitionKey(pk)</option>
-    }
-</select>
-<input type="text" @bind="SearchText" @bind:event="oninput" />
-
-@if (Results != null)
+@if (Catalog != null)
 {
-    <ul>
-        @foreach ((string partitionKey, string rowKey) result in Results)
-        {
-            <li>@result.rowKey</li>
-        }
-    </ul>
+    <div class="input-group">
+        <select class="form-control border-right-0 border" @bind="SelectedPartitionKey">
+            <option></option>
+            @foreach (string pk in Catalog.Select(post => post.PartitionKey).Distinct())
+            {
+                <option value="@pk">@PrettyPrinter.DateStringFromBlogPostPartitionKey(pk)</option>
+            }
+        </select>
+
+        <div class="input-group-append">
+            <div class="input-group-text">
+                <i class="fa fa-calendar"></i>
+            </div>
+        </div>
+    </div>
+    <div class="input-group">
+        <input class="form-control border-right-0 @(ResultsAreDisplayed ? "rounding-bottom-0 border-bottom-0" : "") border"
+               type="text"
+               placeholder="Title..."
+               @bind="SearchText"
+               @bind:event="oninput" />
+
+        <div class="input-group-append @(ResultsAreDisplayed ? "rounding-bottom-0 border-bottom-0" : "")">
+            <div class="input-group-text @(ResultsAreDisplayed ? "rounding-bottom-0 border-bottom-0" : "")">
+                <i class="fa fa-search"></i>
+            </div>
+        </div>
+    </div>
+
+    @if (ResultsAreDisplayed)
+    {
+        <ul class="search-results">
+            @foreach ((string partitionKey, string rowKey) result in Results)
+            {
+                <li class="">
+                    <NavLink href="@($"/detail/{PrettyPrinter.DateStringFromBlogPostPartitionKey(result.partitionKey)}/{result.rowKey}")">
+                        @result.rowKey.Substring(57)
+                    </NavLink>
+                </li>
+            }
+        </ul>
+    }
 }
 
 @code {
@@ -26,9 +54,18 @@
     private string SearchText { get; set; }
     private IEnumerable<(string partitionKey, string rowKey)> Results
     {
-        get { return Catalog
-            .Where(post => post.PartitionKey == SelectedPartitionKey)
-            .Where(post => post.RowKey.Contains(SearchText ?? "", StringComparison.InvariantCultureIgnoreCase));
+        get
+        {
+            return from post in Catalog
+                   where
+                   (post.PartitionKey == SelectedPartitionKey) || string.IsNullOrEmpty(SelectedPartitionKey)
+                   where
+                   post.RowKey.Substring(57).Contains(SearchText ?? "", StringComparison.InvariantCultureIgnoreCase)
+                   select post;
         }
+    }
+    private bool ResultsAreDisplayed
+    {
+        get { return !string.IsNullOrEmpty(SelectedPartitionKey) || !string.IsNullOrEmpty(SearchText); }
     }
 }

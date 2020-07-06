@@ -10,6 +10,11 @@ a, .btn-link {
     color: #0366d6;
 }
 
+.rounding-bottom-0 {
+    border-bottom-left-radius: 0;
+    border-bottom-right-radius: 0;
+}
+
 .btn-primary {
     color: #fff;
     background-color: #1b6ec2;
@@ -113,6 +118,30 @@ app {
     min-width: 400px;
     margin-bottom: auto;
 }
+
+.search-results {
+    max-height: 50vh;
+    overflow-y: auto;
+    list-style: none;
+    padding-left: 0;
+    background-color: #fff;
+    border-top-left-radius: 0 !important;
+    border-top-right-radius: 0 !important;
+    border-bottom-left-radius: .25rem;
+    border-bottom-right-radius: .25rem;
+    border-width: 1px;
+    border-style: solid;
+    border-color: #ced4da;
+}
+
+    .search-results > li > a {
+        padding: .375rem .75rem;
+        background-clip: padding-box;
+        font-size: 1rem;
+        font-weight: 400;
+        line-height: 1.5;
+        color: #495057;
+    }
 
 .navbar-toggler {
     background-color: rgba(255, 255, 255, 0.1);

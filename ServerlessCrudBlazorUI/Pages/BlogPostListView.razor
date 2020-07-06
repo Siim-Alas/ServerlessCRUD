@@ -12,7 +12,6 @@
 
         @if (hasInitialized)
         {
-            <BlogPostSearch Catalog="catalog" />
             <ul class="list-group">
                 @foreach (BlogPostEntity post in blogPosts[index])
                 {
@@ -77,10 +76,7 @@
     </div>
 </div>
 <Sidebar>
-    <h4>Have a nice read!</h4>
-    <p>
-        Writing posts is limited to admins.
-    </p>
+    <BlogPostSearch Catalog="catalog" />
 </Sidebar>
 
 @code {
