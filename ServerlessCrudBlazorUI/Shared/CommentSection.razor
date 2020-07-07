@@ -1,9 +1,12 @@
 ﻿@using ServerlessCrudClassLibrary
 @using System.Security.Claims
+@using Microsoft.AspNetCore.WebUtilities
 @using ServerlessCrudBlazorUI.Services.APIClients
 
 @inject AnnonymousCrudFunctionAPIClient annonymousClient
 @inject AuthenticatedCrudFunctionAPIClient authenticatedClient
+@inject SocialMediaAccountsAPIClient socialMediaClient
+@inject NavigationManager navigationManager
 
 <div class="comment-section">
     <h4>Comments</h4>
@@ -25,6 +28,8 @@
             else
             {
                 <p>Sign in to comment.</p>
+                <a href="@socialMediaClient.FacebookLoginURL">Sign in with Facebook</a>
+                <button type="button" @onclick="@(async() => { Console.WriteLine(await socialMediaClient.GetAccessTokenFromFacebook()); })">Sign in with Facebook</button>
             }
         </li>
         @if (hasLoaded)

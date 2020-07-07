@@ -23,6 +23,8 @@ namespace ServerlessCrudBlazorUI
                 .AddHttpMessageHandler<AuthenticatedAuthorizationMessageHandler>();
             builder.Services.AddHttpClient<AnnonymousCrudFunctionAPIClient>();
 
+            builder.Services.AddHttpClient<SocialMediaAccountsAPIClient>();
+
             builder.Services.AddMsalAuthentication(options =>
             {
                 builder.Configuration.Bind("AzureAd", options.ProviderOptions.Authentication);
