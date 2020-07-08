@@ -17,10 +17,12 @@ namespace ServerlessCrudFunctions
     public class InsertOrMergeComment
     {
         private readonly JwtService _jwtService;
+        private readonly IdentityAPIClient _client;
 
-        public InsertOrMergeComment(JwtService service)
+        public InsertOrMergeComment(JwtService service, IdentityAPIClient client)
         {
             _jwtService = service;
+            _client = client;
         }
 
         [FunctionName("InsertOrMergeComment")]
@@ -31,24 +33,28 @@ namespace ServerlessCrudFunctions
         {
             try
             {
-                CommentEntity comment = JsonConvert.DeserializeObject<CommentEntity>(
+                PostCommentEntityRequest request = JsonConvert.DeserializeObject<PostCommentEntityRequest>(
                     await req.ReadAsStringAsync()
                     );
 
-                if (!comment.IsValid)
+                switch (request.IdentityProvider)
+                {
+                    case PostCommentEntityRequest.IdentityProviders.Facebook:
+                        if (request.UserID != (await _client.GetFacebookMeResponseAsync(request.AccessToken)).Id)
+                        {
+                            return new UnauthorizedResult();
+                        }
+                        break;
+                    default:
+                        return new BadRequestErrorMessageResult("No identity provider was specified.");
+                }
+
+                if (!request.Comment.IsValid)
                 {
                     return new BadRequestErrorMessageResult("The CommentEntity.IsValid check failed.");
                 }
-                else if (
-                    ((await _jwtService.GetClaimsPrincipalAsync(req))
-                    .FindFirst("http://schemas.microsoft.com/identity/claims/objectidentifier").Value != comment.AuthorOID) ||
-                    string.IsNullOrEmpty(comment.AuthorOID))
-                {
-                    // "oid" claim is invalid.
-                    return new UnauthorizedResult();
-                }
 
-                TableOperation insertOrMergeOperation = TableOperation.InsertOrMerge(comment);
+                TableOperation insertOrMergeOperation = TableOperation.InsertOrMerge(request.Comment);
                 TableResult result = await table.ExecuteAsync(insertOrMergeOperation);
 
                 return new OkResult();

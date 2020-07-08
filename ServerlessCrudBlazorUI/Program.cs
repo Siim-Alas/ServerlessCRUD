@@ -15,12 +15,12 @@ namespace ServerlessCrudBlazorUI
             builder.RootComponents.Add<App>("app");
 
             builder.Services.AddTransient<AuthorizedAuthorizationMessageHandler>();
-            builder.Services.AddTransient<AuthenticatedAuthorizationMessageHandler>();
+            //builder.Services.AddTransient<AuthenticatedAuthorizationMessageHandler>();
 
             builder.Services.AddHttpClient<AuthorizedCrudFunctionAPIClient>()
                 .AddHttpMessageHandler<AuthorizedAuthorizationMessageHandler>();
-            builder.Services.AddHttpClient<AuthenticatedCrudFunctionAPIClient>()
-                .AddHttpMessageHandler<AuthenticatedAuthorizationMessageHandler>();
+            builder.Services.AddHttpClient<AuthenticatedCrudFunctionAPIClient>();
+                //.AddHttpMessageHandler<AuthenticatedAuthorizationMessageHandler>();
             builder.Services.AddHttpClient<AnnonymousCrudFunctionAPIClient>();
 
             builder.Services.AddHttpClient<SocialMediaAccountsAPIClient>();

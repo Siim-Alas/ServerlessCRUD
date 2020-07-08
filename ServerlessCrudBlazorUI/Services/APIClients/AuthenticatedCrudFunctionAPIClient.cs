@@ -16,13 +16,13 @@ namespace ServerlessCrudBlazorUI.Services.APIClients
             _client.BaseAddress = new Uri("https://serverlesscrud.azurewebsites.net/api/");
         }
 
-        public async Task<HttpResponseMessage> PostCommentEntityAsync(CommentEntity comment)
+        public async Task<HttpResponseMessage> PostCommentEntityAsync(PostCommentEntityRequest request)
         {
             try
             {
                 return await _client.PostAsJsonAsync(
                     "InsertOrMergeComment",
-                    comment);
+                    request);
             }
             catch (Exception e)
             {

@@ -2,10 +2,7 @@
 // Reference: https://developers.facebook.com/docs/reference/javascript/FB.getLoginStatus/
 
 window.FacebookClient = {
-    getAccessToken: function () {
-        var uid;
-        var accessToken;
-
+    logIn: function (dotnetHelper) {
         FB.init({
             appId: '201848331183252',
             autoLogAppEvents: true,
@@ -15,18 +12,17 @@ window.FacebookClient = {
 
         FB.getLoginStatus(function (response) {
             if (response.status === 'connected') {
-                uid = response.authResponse.userID;
-                accessToken = response.authResponse.accessToken;
-                console.log(uid);
-                console.log(accessToken);
+                dotnetHelper.invokeMethodAsync('InvokeCallback', [response.authResponse.userID, response.authResponse.accessToken]);
             } else {
                 FB.login(function (r) {
-                    uid = r.authResponse.userID;
-                    accessToken = r.authResponse.accessToken;
-                    console.log(uid);
-                    console.log(accessToken);
+                    dotnetHelper.invokeMethodAsync('InvokeCallback', [r.authResponse.userID, r.authResponse.accessToken]);
                 });
             }
+        });
+    }, 
+    logOut: function () {
+        FB.logout(function (response) {
+            
         });
     }
 };

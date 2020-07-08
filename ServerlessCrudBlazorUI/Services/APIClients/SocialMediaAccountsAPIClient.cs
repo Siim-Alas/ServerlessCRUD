@@ -1,24 +1,27 @@
 ﻿using Microsoft.AspNetCore.Components;
 using Microsoft.JSInterop;
+using ServerlessCrudBlazorUI.Services.JSInteropHelpers;
+using ServerlessCrudClassLibrary;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http;
+using System.Net.Http.Json;
+using System.Security.Claims;
 using System.Threading.Tasks;
 
 namespace ServerlessCrudBlazorUI.Services.APIClients
 {
-    public class SocialMediaAccountsAPIClient
+    public class SocialMediaAccountsAPIClient : IDisposable
     {
+        public delegate void StateHasChangedEventHandler(object source, EventArgs args);
+        public event StateHasChangedEventHandler StateHasChanged;
+
         private readonly HttpClient _client;
         private readonly NavigationManager _navigationManager;
         private readonly IJSRuntime _JSRuntime;
 
-        private readonly string callbackAddress = "https://localhost:44389/authentication/login-callback";
-
-        private readonly string facebookBaseAddress = "https://www.facebook.com/v7.0/";
-        private readonly string facebookClientID = "201848331183252";
-        private readonly string facebookStateString = "a08e09f2eb5deb3319f97a32dbb03b04";
+        private DotNetObjectReference<CallbackHelper> _callbackReference;
 
         public SocialMediaAccountsAPIClient(
             HttpClient client, 
@@ -29,15 +32,56 @@ namespace ServerlessCrudBlazorUI.Services.APIClients
             _navigationManager = navigationManager;
             _JSRuntime = jSRuntime;
         }
+        /// <summary>
+        /// Gets or sets the ClaimsPrincipal populated by API calls.
+        /// </summary>
+        public ClaimsPrincipal User { get; set; }
 
-        public string FacebookLoginURL
+        #region Facebook
+        public static string FacebookAuthenticationType
         {
-            get { return $"{facebookBaseAddress}dialog/oauth?client_id={facebookClientID}&redirect_uri={Uri.EscapeDataString(_navigationManager.Uri)}&state={facebookStateString}"; }
+            get { return "CustomFacebook"; }
+        }
+        public bool LoggedInWithFacebook 
+        { 
+            get { return User?.Identity?.AuthenticationType == "CustomFacebook"; }
         }
 
-        public async Task<string> GetAccessTokenFromFacebook()
+        public async Task LogInWithFacebook()
         {
-            return await _JSRuntime.InvokeAsync<string>("FacebookClient.getAccessToken");
+            _callbackReference = DotNetObjectReference.Create(new CallbackHelper(FacebookAuthCallback));
+            await _JSRuntime.InvokeVoidAsync("FacebookClient.logIn", _callbackReference);
+        }
+        public async Task LogOutWithFacebook()
+        {
+            await _JSRuntime.InvokeVoidAsync("FacebookClient.logOut");
+            User = null;
+            StateHasChanged(this, EventArgs.Empty);
+        }
+        public async Task FacebookAuthCallback(object[] args)
+        {
+            FacebookMeResponse response = await _client.GetFromJsonAsync<FacebookMeResponse>($"https://graph.facebook.com/me?access_token={args[1]}");
+
+            Console.WriteLine(response.Id);
+            Console.WriteLine(response.Name);
+
+            User = new ClaimsPrincipal(
+                    new ClaimsIdentity(
+                        new Claim[]
+                        {
+                            new Claim("name", response.Name),
+                            new Claim("userId", args[0].ToString()), 
+                            new Claim("accessToken", args[1].ToString())
+                        }, 
+                        FacebookAuthenticationType)
+                );
+            StateHasChanged(this, EventArgs.Empty);
+        }
+        #endregion
+
+        public void Dispose()
+        {
+            _callbackReference?.Dispose();
         }
     }
 }

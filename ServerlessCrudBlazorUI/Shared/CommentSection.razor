@@ -24,12 +24,12 @@
 
                     <button class="btn btn-dark" type="submit">Comment</button>
                 </EditForm>
+                <button type="button" @onclick="socialMediaClient.LogOutWithFacebook">Log out.</button>
             }
             else
             {
                 <p>Sign in to comment.</p>
-                <a href="@socialMediaClient.FacebookLoginURL">Sign in with Facebook</a>
-                <button type="button" @onclick="@(async() => { Console.WriteLine(await socialMediaClient.GetAccessTokenFromFacebook()); })">Sign in with Facebook</button>
+                <button type="button" @onclick="socialMediaClient.LogInWithFacebook">Log in with Facebook.</button>
             }
         </li>
         @if (hasLoaded)
@@ -60,8 +60,13 @@
     {
         if (newComment.IsValid && Commenter.Identity.IsAuthenticated)
         {
-            await authenticatedClient.PostCommentEntityAsync(newComment);
-            newComment = new CommentEntity(BlogPost, Commenter, "...");
+            await authenticatedClient.PostCommentEntityAsync(new PostCommentEntityRequest(
+                    newComment,
+                    PostCommentEntityRequest.IdentityProviders.Facebook,
+                    Commenter.FindFirst("userId").Value,
+                    Commenter.FindFirst("accessToken").Value
+                ));
+            newComment = new CommentEntity(BlogPost, Commenter.FindFirst("name").Value, "...");
             await this.OnParametersSetAsync();
         }
     }
@@ -72,8 +77,15 @@
 
         if (Commenter.Identity.IsAuthenticated)
         {
-            newComment = new CommentEntity(BlogPost, Commenter, "...");
+            newComment = new CommentEntity(BlogPost, Commenter.FindFirst("name").Value, "...");
         }
+
+        socialMediaClient.StateHasChanged += (object source, EventArgs args) =>
+        {
+            Commenter = socialMediaClient.User;
+            newComment = new CommentEntity(BlogPost, Commenter.FindFirst("name").Value, "...");
+            this.StateHasChanged();
+        };
     }
 
     protected override async Task OnParametersSetAsync()
