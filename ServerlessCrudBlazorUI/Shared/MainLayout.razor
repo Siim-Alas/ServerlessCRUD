@@ -14,6 +14,8 @@
     </h3>
 </div>
 
+<div @ref="dummyDiv"></div>
+
 <div @ref="topRowReference" class="top-row">
     <div class="flex-grow-1">
         <NavMenu />
@@ -31,9 +33,9 @@
 
 <footer class="py-4 bg-dark text-white-50">
     <div class="container text-center">
-        Copyright &copy; Blazor Blog &mdash; 
-        <NavLink href="/privacy">Privacy</NavLink>
-        <NavLink href="/terms-and-conditions">Terms and Conditions</NavLink>
+        &copy; @DateTime.Now.Year &mdash; Siim Alas &mdash; 
+        <NavLink class="text-white" href="/privacy"><b>Privacy</b></NavLink> &mdash; 
+        <NavLink class="text-white" href="/terms-and-conditions"><b>Terms and Conditions</b></NavLink>
     </div>
 </footer>
 
@@ -42,6 +44,7 @@
 
     private ElementReference topRowReference;
     private ElementReference headerReference;
+    private ElementReference dummyDiv;
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
@@ -49,7 +52,7 @@
 
         if (firstRender)
         {
-            await JsRuntime.InvokeVoidAsync("OwnStickifier.stickify", topRowReference, headerReference);
+            await JsRuntime.InvokeVoidAsync("OwnStickifier.stickify", topRowReference, headerReference, dummyDiv);
         }
     }
 }
