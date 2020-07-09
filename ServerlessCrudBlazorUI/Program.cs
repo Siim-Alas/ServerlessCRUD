@@ -1,8 +1,10 @@
 using System.Threading.Tasks;
+using Blazored.SessionStorage;
 using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using ServerlessCrudBlazorUI.Services.APIClients;
+using ServerlessCrudBlazorUI.Services.AuthenticationStateProviders;
 using ServerlessCrudBlazorUI.Services.HttpMessageHandlers;
 
 namespace ServerlessCrudBlazorUI
@@ -13,6 +15,9 @@ namespace ServerlessCrudBlazorUI
         {
             var builder = WebAssemblyHostBuilder.CreateDefault(args);
             builder.RootComponents.Add<App>("app");
+
+            builder.Services.AddBlazoredSessionStorage();
+            builder.Services.AddScoped<SocialMediaAuthenticationStateProvider>();
 
             builder.Services.AddTransient<AuthorizedAuthorizationMessageHandler>();
             //builder.Services.AddTransient<AuthenticatedAuthorizationMessageHandler>();

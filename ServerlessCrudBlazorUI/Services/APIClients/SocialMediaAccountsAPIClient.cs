@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Components;
 using Microsoft.JSInterop;
+using ServerlessCrudBlazorUI.Services.AuthenticationStateProviders;
 using ServerlessCrudBlazorUI.Services.JSInteropHelpers;
 using ServerlessCrudClassLibrary;
 using System;
@@ -14,39 +15,23 @@ namespace ServerlessCrudBlazorUI.Services.APIClients
 {
     public class SocialMediaAccountsAPIClient : IDisposable
     {
-        public delegate void StateHasChangedEventHandler(object source, EventArgs args);
-        public event StateHasChangedEventHandler StateHasChanged;
-
         private readonly HttpClient _client;
-        private readonly NavigationManager _navigationManager;
         private readonly IJSRuntime _JSRuntime;
+        private readonly SocialMediaAuthenticationStateProvider _socialMediaAuthStateProvider;
 
         private DotNetObjectReference<CallbackHelper> _callbackReference;
 
         public SocialMediaAccountsAPIClient(
             HttpClient client, 
-            NavigationManager navigationManager, 
-            IJSRuntime jSRuntime)
+            IJSRuntime jSRuntime, 
+            SocialMediaAuthenticationStateProvider socialMediaAuthStateProvider)
         {
             _client = client;
-            _navigationManager = navigationManager;
             _JSRuntime = jSRuntime;
+            _socialMediaAuthStateProvider = socialMediaAuthStateProvider;
         }
-        /// <summary>
-        /// Gets or sets the ClaimsPrincipal populated by API calls.
-        /// </summary>
-        public ClaimsPrincipal User { get; set; }
 
         #region Facebook
-        public static string FacebookAuthenticationType
-        {
-            get { return "CustomFacebook"; }
-        }
-        public bool LoggedInWithFacebook 
-        { 
-            get { return User?.Identity?.AuthenticationType == "CustomFacebook"; }
-        }
-
         public async Task LogInWithFacebook()
         {
             _callbackReference = DotNetObjectReference.Create(new CallbackHelper(FacebookAuthCallback));
@@ -55,26 +40,31 @@ namespace ServerlessCrudBlazorUI.Services.APIClients
         public async Task LogOutWithFacebook()
         {
             await _JSRuntime.InvokeVoidAsync("FacebookClient.logOut");
-            User = null;
-            StateHasChanged(this, EventArgs.Empty);
+            await _socialMediaAuthStateProvider.SignOutUser();
         }
         public async Task FacebookAuthCallback(object[] args)
         {
-            FacebookMeResponse response = await _client.GetFromJsonAsync<FacebookMeResponse>($"https://graph.facebook.com/me?access_token={args[1]}");
-
-            User = new ClaimsPrincipal(
-                    new ClaimsIdentity(
-                        new Claim[]
-                        {
-                            new Claim("name", response.Name),
-                            new Claim("userId", args[0].ToString()), 
-                            new Claim("accessToken", args[1].ToString())
-                        }, 
-                        FacebookAuthenticationType)
-                );
-            StateHasChanged(this, EventArgs.Empty);
+            await _socialMediaAuthStateProvider.SignInUser(
+                SocialMediaAuthenticationStateProvider.FacebookAuthenticationType, 
+                (await _client.GetFromJsonAsync<FacebookMeResponse>($"https://graph.facebook.com/me?access_token={args[1]}"))
+                .Name, 
+                args[0].ToString(), 
+                args[1].ToString());
         }
         #endregion
+
+        public async Task LogOut()
+        {
+            ClaimsPrincipal user = (await _socialMediaAuthStateProvider.GetAuthenticationStateAsync()).User;
+            switch (user.Identity.AuthenticationType)
+            {
+                case SocialMediaAuthenticationStateProvider.FacebookAuthenticationType:
+                    await LogOutWithFacebook();
+                    break;
+                default:
+                    break;
+            }
+        }
 
         public void Dispose()
         {

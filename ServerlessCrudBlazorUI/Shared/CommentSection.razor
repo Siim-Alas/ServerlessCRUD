@@ -1,12 +1,13 @@
 ﻿@using ServerlessCrudClassLibrary
 @using System.Security.Claims
-@using Microsoft.AspNetCore.WebUtilities
+@using ServerlessCrudBlazorUI.Services.AuthenticationStateProviders
 @using ServerlessCrudBlazorUI.Services.APIClients
 
 @inject AnnonymousCrudFunctionAPIClient annonymousClient
 @inject AuthenticatedCrudFunctionAPIClient authenticatedClient
 @inject SocialMediaAccountsAPIClient socialMediaClient
 @inject NavigationManager navigationManager
+@inject SocialMediaAuthenticationStateProvider socialMediaAuthStateProvider
 
 <div class="comment-section">
     <h4>Comments</h4>
@@ -24,7 +25,7 @@
 
                     <button class="btn btn-dark" type="submit">Comment</button>
                 </EditForm>
-                <button type="button" @onclick="socialMediaClient.LogOutWithFacebook">Log out.</button>
+                <button type="button" @onclick="socialMediaClient.LogOut">Log out.</button>
             }
             else
             {
@@ -52,24 +53,36 @@
 @code {
     [Parameter]
     public BlogPostEntity BlogPost { get; set; }
-    [Parameter]
-    public ClaimsPrincipal Commenter { get; set; }
 
+    private ClaimsPrincipal user { get; set; }
+    private PostCommentEntityRequest.IdentityProviders provider
+    {
+        get
+        {
+            switch (user.Identity.AuthenticationType)
+            {
+                case SocialMediaAuthenticationStateProvider.FacebookAuthenticationType:
+                    return PostCommentEntityRequest.IdentityProviders.Facebook;
+                default:
+                    return PostCommentEntityRequest.IdentityProviders.Facebook;
+            }
+        }
+    }
     private CommentEntity newComment { get; set; }
     private CommentEntity[] comments { get; set; }
     private bool hasLoaded { get; set; } = false;
 
     private async Task OnValidSubmit()
     {
-        if (newComment.IsValid && Commenter.Identity.IsAuthenticated)
+        if (newComment.IsValid && user.Identity.IsAuthenticated)
         {
             await authenticatedClient.PostCommentEntityAsync(new PostCommentEntityRequest(
                     newComment,
-                    PostCommentEntityRequest.IdentityProviders.Facebook,
-                    Commenter.FindFirst("userId").Value,
-                    Commenter.FindFirst("accessToken").Value
+                    provider,
+                    user.FindFirst("userId").Value,
+                    user.FindFirst("accessToken").Value
                 ));
-            newComment = new CommentEntity(BlogPost, Commenter.FindFirst("name").Value, "...");
+            newComment = new CommentEntity(BlogPost, user.Identity.Name, "...");
             await this.OnParametersSetAsync();
         }
     }
@@ -78,15 +91,17 @@
     {
         await base.OnInitializedAsync();
 
-        if (Commenter.Identity.IsAuthenticated)
+        user = (await socialMediaAuthStateProvider.GetAuthenticationStateAsync()).User;
+
+        if (user.Identity.IsAuthenticated)
         {
-            newComment = new CommentEntity(BlogPost, Commenter.FindFirst("name").Value, "...");
+            newComment = new CommentEntity(BlogPost, user.Identity.Name, "...");
         }
 
-        socialMediaClient.StateHasChanged += (object source, EventArgs args) =>
+        socialMediaAuthStateProvider.AuthenticationStateChanged += (Task<AuthenticationState> task) =>
         {
-            Commenter = socialMediaClient.User;
-            newComment = (Commenter?.Identity.IsAuthenticated == null) ? null : new CommentEntity(BlogPost, Commenter.FindFirst("name").Value, "...");
+            user = task.Result.User;
+            newComment = (user.Identity.IsAuthenticated) ? new CommentEntity(BlogPost, user.Identity.Name, "...") : null;
             this.StateHasChanged();
         };
     }
