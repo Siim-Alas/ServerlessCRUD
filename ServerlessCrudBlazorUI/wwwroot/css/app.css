@@ -10,6 +10,17 @@ a, .btn-link {
     color: #0366d6;
 }
 
+.facebook-login-button {
+    background-color: #1877F2;
+    border: none;
+    padding: 10px;
+    border-radius: 5px;
+}
+
+.facebook-login-button:focus {
+    outline: none;
+}
+
 .rounding-bottom-0 {
     border-bottom-left-radius: 0;
     border-bottom-right-radius: 0;

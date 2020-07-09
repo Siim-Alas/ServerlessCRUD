@@ -12,7 +12,7 @@
     <h4>Comments</h4>
     <ul class="list-group">
         <li class="list-group-item">
-            @if (Commenter.Identity.IsAuthenticated)
+            @if (newComment != null)
             {
                 <EditForm Model="newComment" OnValidSubmit="OnValidSubmit">
                     <DataAnnotationsValidator />
@@ -29,7 +29,10 @@
             else
             {
                 <p>Sign in to comment.</p>
-                <button type="button" @onclick="socialMediaClient.LogInWithFacebook">Log in with Facebook.</button>
+                <button class="facebook-login-button" type="button" @onclick="socialMediaClient.LogInWithFacebook">
+                    <img src="Images/f_logo_RGB-White_58.png" width="32" height="32" />&ensp;
+                    <b class="text-white">Login with Facebook</b>
+                </button>
             }
         </li>
         @if (hasLoaded)
@@ -83,7 +86,7 @@
         socialMediaClient.StateHasChanged += (object source, EventArgs args) =>
         {
             Commenter = socialMediaClient.User;
-            newComment = new CommentEntity(BlogPost, Commenter.FindFirst("name").Value, "...");
+            newComment = (Commenter?.Identity.IsAuthenticated == null) ? null : new CommentEntity(BlogPost, Commenter.FindFirst("name").Value, "...");
             this.StateHasChanged();
         };
     }

@@ -62,9 +62,6 @@ namespace ServerlessCrudBlazorUI.Services.APIClients
         {
             FacebookMeResponse response = await _client.GetFromJsonAsync<FacebookMeResponse>($"https://graph.facebook.com/me?access_token={args[1]}");
 
-            Console.WriteLine(response.Id);
-            Console.WriteLine(response.Name);
-
             User = new ClaimsPrincipal(
                     new ClaimsIdentity(
                         new Claim[]
