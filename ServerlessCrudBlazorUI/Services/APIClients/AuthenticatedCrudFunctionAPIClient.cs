@@ -13,7 +13,7 @@ namespace ServerlessCrudBlazorUI.Services.APIClients
         public AuthenticatedCrudFunctionAPIClient(HttpClient client)
         {
             _client = client;
-            _client.BaseAddress = new Uri("https://serverlesscrud.azurewebsites.net/api/");
+            //_client.BaseAddress = new Uri("https://serverlesscrud.azurewebsites.net/api/");
         }
 
         public async Task<HttpResponseMessage> PostCommentEntityAsync(PostCommentEntityRequest request)

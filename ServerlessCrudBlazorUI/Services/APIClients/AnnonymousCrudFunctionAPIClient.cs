@@ -15,7 +15,7 @@ namespace ServerlessCrudBlazorUI.Services.APIClients
         public AnnonymousCrudFunctionAPIClient(HttpClient client)
         {
             _client = client;
-            _client.BaseAddress = new Uri("https://serverlesscrud.azurewebsites.net/api/");
+            //_client.BaseAddress = new Uri("https://serverlesscrud.azurewebsites.net/api/");
         }
 
         public async Task<QueryBlogPostEntitiesResponse> GetQueryBlogPostsResponseAsync(
