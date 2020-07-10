@@ -26,5 +26,12 @@ namespace ServerlessCrudFunctions.Services
                     ).Content.ReadAsStringAsync()
                 );
         }
+        public async Task<GoogleIdTokenResponse> GetGoogleIdTokenResponseAsync(string idToken)
+        {
+            return JsonConvert.DeserializeObject<GoogleIdTokenResponse>(
+                await (await _client.GetAsync($"https://oauth2.googleapis.com/tokeninfo?id_token={idToken}")
+                ).Content.ReadAsStringAsync()
+            );
+        }
     }
 }

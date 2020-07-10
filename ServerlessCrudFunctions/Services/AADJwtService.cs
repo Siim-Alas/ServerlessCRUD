@@ -2,6 +2,7 @@
 using Microsoft.IdentityModel.Protocols;
 using Microsoft.IdentityModel.Protocols.OpenIdConnect;
 using Microsoft.IdentityModel.Tokens;
+using ServerlessCrudFunctions.Services.Interfaces;
 using System;
 using System.Collections.Generic;
 using System.IdentityModel.Tokens.Jwt;
@@ -10,7 +11,7 @@ using System.Threading.Tasks;
 
 namespace ServerlessCrudFunctions.Services
 {
-    public class JwtService
+    public class AADJwtService : IJwtService
     {
         // Reference: https://github.com/Azure-Samples/ms-identity-dotnet-webapi-azurefunctions
 
@@ -31,7 +32,7 @@ namespace ServerlessCrudFunctions.Services
             }; } }
         #endregion
 
-        public JwtService()
+        public AADJwtService()
         {
             Audience = "https://serverlesscrud.azurewebsites.net";
             ClientId = "db944478-cbda-4214-8ad6-7b310465ce97";

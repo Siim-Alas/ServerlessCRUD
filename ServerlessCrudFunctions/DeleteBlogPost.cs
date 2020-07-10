@@ -16,9 +16,9 @@ namespace ServerlessCrudFunctions
 {
     public class DeleteBlogPost
     {
-        private readonly JwtService _jwtService;
+        private readonly AADJwtService _jwtService;
 
-        public DeleteBlogPost(JwtService service)
+        public DeleteBlogPost(AADJwtService service)
         {
             _jwtService = service;
         }

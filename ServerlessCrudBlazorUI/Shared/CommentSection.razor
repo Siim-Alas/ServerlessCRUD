@@ -29,10 +29,12 @@
             }
             else
             {
-                <p>Sign in to comment.</p>
                 <button class="facebook-login-button" type="button" @onclick="socialMediaClient.LogInWithFacebook">
                     <img src="Images/f_logo_RGB-White_58.png" width="32" height="32" />&ensp;
                     <b class="text-white">Login with Facebook</b>
+                </button>
+                <button type="button" @onclick="socialMediaClient.LogInWithGoogle">
+                    Login with Google
                 </button>
             }
         </li>
@@ -63,6 +65,8 @@
             {
                 case SocialMediaAuthenticationStateProvider.FacebookAuthenticationType:
                     return PostCommentEntityRequest.IdentityProviders.Facebook;
+                case SocialMediaAuthenticationStateProvider.GoogleAuthenticationType:
+                    return PostCommentEntityRequest.IdentityProviders.Google;
                 default:
                     return PostCommentEntityRequest.IdentityProviders.Facebook;
             }
@@ -80,7 +84,7 @@
                     newComment,
                     provider,
                     user.FindFirst("userId").Value,
-                    user.FindFirst("accessToken").Value
+                    user.FindFirst("token").Value
                 ));
             newComment = new CommentEntity(BlogPost, user.Identity.Name, "...");
             await this.OnParametersSetAsync();

@@ -10,7 +10,7 @@ namespace ServerlessCrudFunctions
     {
         public override void Configure(IFunctionsHostBuilder builder)
         {
-            builder.Services.AddScoped<JwtService>();
+            builder.Services.AddScoped<AADJwtService>();
             builder.Services.AddHttpClient<IdentityAPIClient>();
         }
     }

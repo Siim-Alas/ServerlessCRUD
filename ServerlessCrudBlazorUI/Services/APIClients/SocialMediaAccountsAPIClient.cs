@@ -53,6 +53,27 @@ namespace ServerlessCrudBlazorUI.Services.APIClients
         }
         #endregion
 
+        #region Google
+        public async Task LogInWithGoogle()
+        {
+            _callbackReference = DotNetObjectReference.Create(new CallbackHelper(GoogleAuthCallback));
+            await _JSRuntime.InvokeVoidAsync("GoogleClient.logIn", _callbackReference);
+        }
+        public async Task LogOutWithGoogle()
+        {
+            await _JSRuntime.InvokeVoidAsync("GoogleClient.logOut");
+            await _socialMediaAuthStateProvider.SignOutUser();
+        }
+        public async Task GoogleAuthCallback(object[] args)
+        {
+            await _socialMediaAuthStateProvider.SignInUser(
+                SocialMediaAuthenticationStateProvider.GoogleAuthenticationType, 
+                args[0].ToString(), 
+                args[1].ToString(), 
+                args[2].ToString());
+        }
+        #endregion
+
         public async Task LogOut()
         {
             ClaimsPrincipal user = (await _socialMediaAuthStateProvider.GetAuthenticationStateAsync()).User;
@@ -60,6 +81,9 @@ namespace ServerlessCrudBlazorUI.Services.APIClients
             {
                 case SocialMediaAuthenticationStateProvider.FacebookAuthenticationType:
                     await LogOutWithFacebook();
+                    break;
+                case SocialMediaAuthenticationStateProvider.GoogleAuthenticationType:
+                    await LogOutWithGoogle();
                     break;
                 default:
                     break;

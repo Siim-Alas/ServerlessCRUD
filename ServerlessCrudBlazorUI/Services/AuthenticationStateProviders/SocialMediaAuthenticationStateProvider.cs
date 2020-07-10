@@ -14,6 +14,7 @@ namespace ServerlessCrudBlazorUI.Services.AuthenticationStateProviders
         private readonly ISessionStorageService _sessionStorage;
 
         public const string FacebookAuthenticationType = "CustomFacebook";
+        public const string GoogleAuthenticationType = "CustomGoogle";
 
         public SocialMediaAuthenticationStateProvider(ISessionStorageService sessionStorage)
         {
@@ -28,7 +29,7 @@ namespace ServerlessCrudBlazorUI.Services.AuthenticationStateProviders
                     { 
                         new Claim("name", (await _sessionStorage.GetItemAsync<string>("customAuthStateProviderUserName")) ?? ""),
                         new Claim("userId", (await _sessionStorage.GetItemAsync<string>("customAuthStateProviderUserId")) ?? ""), 
-                        new Claim("accessToken", (await _sessionStorage.GetItemAsync<string>("customAuthStateProviderAccessToken")) ?? "")
+                        new Claim("accessToken", (await _sessionStorage.GetItemAsync<string>("customAuthStateProviderToken")) ?? "")
                     }, 
                     await _sessionStorage.GetItemAsync<string>("customAuthStateProviderAuthType"), 
                     "name", 
@@ -36,9 +37,9 @@ namespace ServerlessCrudBlazorUI.Services.AuthenticationStateProviders
                 )
             );
         }
-        public async Task SignInUser(string authenticationType, string userName, string userId, string accessToken)
+        public async Task SignInUser(string authenticationType, string userName, string userId, string token)
         {
-            await SetLocalStorage(authenticationType, userName, userId, accessToken);
+            await SetLocalStorage(authenticationType, userName, userId, token);
 
             NotifyAuthenticationStateChanged(
                 Task.FromResult(
@@ -48,7 +49,7 @@ namespace ServerlessCrudBlazorUI.Services.AuthenticationStateProviders
                             {
                                 new Claim("name", userName),
                                 new Claim("userId", userId),
-                                new Claim("accessToken", accessToken)
+                                new Claim("token", token)
                             },
                             authenticationType,
                             "name",
@@ -65,12 +66,12 @@ namespace ServerlessCrudBlazorUI.Services.AuthenticationStateProviders
             NotifyAuthenticationStateChanged(Task.FromResult(new AuthenticationState(new ClaimsPrincipal(new ClaimsIdentity()))));
         }
 
-        private async Task SetLocalStorage(string authenticationType, string userName, string userId, string accessToken)
+        private async Task SetLocalStorage(string authenticationType, string userName, string userId, string token)
         {
             await _sessionStorage.SetItemAsync("customAuthStateProviderAuthType", authenticationType);
             await _sessionStorage.SetItemAsync("customAuthStateProviderUserName", userName);
             await _sessionStorage.SetItemAsync("customAuthStateProviderUserId", userId);
-            await _sessionStorage.SetItemAsync("customAuthStateProviderAccessToken", accessToken);
+            await _sessionStorage.SetItemAsync("customAuthStateProviderToken", token);
         }
     }
 }

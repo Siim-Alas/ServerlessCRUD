@@ -16,9 +16,9 @@ namespace ServerlessCrudFunctions
 {
     public class InsertOrMergeBlogPost
     {
-        private readonly JwtService _jwtService;
+        private readonly AADJwtService _jwtService;
 
-        public InsertOrMergeBlogPost(JwtService service)
+        public InsertOrMergeBlogPost(AADJwtService service)
         {
             _jwtService = service;
         }

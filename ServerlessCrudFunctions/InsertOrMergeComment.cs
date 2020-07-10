@@ -16,10 +16,10 @@ namespace ServerlessCrudFunctions
 {
     public class InsertOrMergeComment
     {
-        private readonly JwtService _jwtService;
+        private readonly AADJwtService _jwtService;
         private readonly IdentityAPIClient _client;
 
-        public InsertOrMergeComment(JwtService service, IdentityAPIClient client)
+        public InsertOrMergeComment(AADJwtService service, IdentityAPIClient client)
         {
             _jwtService = service;
             _client = client;
@@ -40,7 +40,20 @@ namespace ServerlessCrudFunctions
                 switch (request.IdentityProvider)
                 {
                     case PostCommentEntityRequest.IdentityProviders.Facebook:
-                        if (request.UserID != (await _client.GetFacebookMeResponseAsync(request.AccessToken)).Id)
+                        FacebookMeResponse fr = await _client.GetFacebookMeResponseAsync(request.Token);
+                        if ((fr.Name != request.Comment.Author) ||
+                            (fr.Id != request.UserID))
+                        {
+                            return new UnauthorizedResult();
+                        }
+                        break;
+                    case PostCommentEntityRequest.IdentityProviders.Google:
+                        GoogleIdTokenResponse gr = await _client.GetGoogleIdTokenResponseAsync(request.Token);
+                        if ((gr.Iss != "accounts.google.com") ||
+                            (gr.Sub != request.UserID) ||
+                            (gr.Aud != "704066166279-dunk2o8blaedb7l149qnu5mphsm1jo69.apps.googleusercontent.com") || 
+                            (DateTimeOffset.FromUnixTimeSeconds(gr.Exp).UtcDateTime < DateTime.UtcNow) || 
+                            (gr.Name != request.Comment.Author))
                         {
                             return new UnauthorizedResult();
                         }
