@@ -11,37 +11,37 @@
 
 <div class="comment-section">
     <h4>Comments</h4>
-    <ul class="list-group">
-        <li class="list-group-item">
-            @if (newComment != null)
-            {
-                <EditForm Model="newComment" OnValidSubmit="OnValidSubmit">
-                    <DataAnnotationsValidator />
-                    <ValidationSummary />
-                    <div class="form-group">
-                        <label for="text">Text</label>
-                        <InputTextArea id="text" class="form-control" rows="3" @bind-Value="newComment.Text"></InputTextArea>
-                    </div>
 
-                    <button class="btn btn-dark" type="submit">Comment</button>
-                </EditForm>
-                <button type="button" @onclick="socialMediaClient.LogOut">Log out.</button>
-            }
-            else
+    @if (newComment == null)
+    {
+        <div>
+            <button class="google-login-button" type="button" @onclick="socialMediaClient.LogInWithGoogle"></button>
+            <br />
+            <button class="facebook-login-button" type="button" @onclick="socialMediaClient.LogInWithFacebook">
+                <img src="Images/f_logo_RGB-White_58.png" width="24" height="24" />&thinsp;
+                <b class="text-white">Login with Facebook</b>
+            </button>
+        </div>
+    }
+    else
+    {
+        <EditForm Model="newComment" OnValidSubmit="OnValidSubmit">
+            <DataAnnotationsValidator />
+            <ValidationSummary />
+            <div class="form-group">
+                <label for="text">Text</label>
+                <InputTextArea id="text" class="form-control" rows="3" @bind-Value="newComment.Text"></InputTextArea>
+            </div>
+
+            <button class="btn btn-dark" type="submit">Comment</button>
+        </EditForm>
+        <button type="button" @onclick="socialMediaClient.LogOut">Log out.</button>
+    }
+    <ul class="list-group">
+            @if (hasLoaded)
             {
-                <button class="facebook-login-button" type="button" @onclick="socialMediaClient.LogInWithFacebook">
-                    <img src="Images/f_logo_RGB-White_58.png" width="32" height="32" />&ensp;
-                    <b class="text-white">Login with Facebook</b>
-                </button>
-                <button type="button" @onclick="socialMediaClient.LogInWithGoogle">
-                    Login with Google
-                </button>
-            }
-        </li>
-        @if (hasLoaded)
-        {
-            foreach (CommentEntity comment in comments)
-            {
+                foreach (CommentEntity comment in comments)
+                {
                 <li class="list-group-item">
                     <b>@comment.Author</b>
                     <p class="text-muted">Posted on @comment.Timestamp.ToLocalTime().ToString("HH:mm d MMMM yyyy")</p>
@@ -97,11 +97,6 @@
 
         user = (await socialMediaAuthStateProvider.GetAuthenticationStateAsync()).User;
 
-        if (user.Identity.IsAuthenticated)
-        {
-            newComment = new CommentEntity(BlogPost, user.Identity.Name, "...");
-        }
-
         socialMediaAuthStateProvider.AuthenticationStateChanged += (Task<AuthenticationState> task) =>
         {
             user = task.Result.User;
@@ -115,6 +110,10 @@
         await base.OnParametersSetAsync();
 
         comments = (await annonymousClient.GetCommentsOnBlogPost(BlogPost)) ?? new CommentEntity[0];
+        if (user.Identity.IsAuthenticated)
+        {
+            newComment = new CommentEntity(BlogPost, user.Identity.Name, "...");
+        }
         hasLoaded = true;
     }
 }

@@ -20,7 +20,7 @@ namespace ServerlessCrudClassLibrary
         /// <param name="text">The text of the comment.</param>
         public CommentEntity(BlogPostEntity blogPost, string author, string text)
         {
-            PartitionKey = $"{blogPost.PartitionKey}_{blogPost.RowKey}";
+            PartitionKey = GetPartitionKeyFromBlogPost(blogPost);
             SetRowKey(author);
             Text = text;
         }
@@ -55,6 +55,15 @@ namespace ServerlessCrudClassLibrary
                     (Timestamp != null) &&
                     (Text != null);
             }
+        }
+        /// <summary>
+        /// Gets the PartitionKey that a comment assigned to the blog post would have.
+        /// </summary>
+        /// <param name="blogPost">The blog post to which the PartitionKey comment would be assigned.</param>
+        /// <returns>The PartitionKey of a comment that would be assigned to the blog post.</returns>
+        public static string GetPartitionKeyFromBlogPost(BlogPostEntity blogPost)
+        {
+            return $"{blogPost.PartitionKey}_{blogPost.RowKey}";
         }
         /// <summary>
         /// Sets the RowKey of the comment in the format (REVERSETICKS_AUTHORNAME).
