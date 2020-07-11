@@ -1,0 +1,28 @@
+﻿
+<div>
+    <div class="@TogglerClass" @onclick="ToggleContent">
+        @Toggler
+    </div>
+    <div class="own-dropdown @ChildContentClass" style="display:@(ShowContent ? "block" : "none");">
+        @ChildContent
+    </div>
+</div>
+
+@code {
+    [Parameter]
+    public RenderFragment Toggler { get; set; }
+    [Parameter]
+    public RenderFragment ChildContent { get; set; }
+
+    [Parameter]
+    public string TogglerClass { get; set; }
+    [Parameter]
+    public string ChildContentClass { get; set; }
+
+    private bool ShowContent { get; set; } = false;
+
+    private void ToggleContent()
+    {
+        ShowContent = !ShowContent;
+    }
+}

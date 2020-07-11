@@ -15,8 +15,10 @@
     @if (newComment == null)
     {
         <div>
+            <p>
+                Log in to comment.
+            </p>
             <button class="google-login-button" type="button" @onclick="socialMediaClient.LogInWithGoogle"></button>
-            <br />
             <button class="facebook-login-button" type="button" @onclick="socialMediaClient.LogInWithFacebook">
                 <img src="Images/f_logo_RGB-White_58.png" width="24" height="24" />&thinsp;
                 <b class="text-white">Login with Facebook</b>
@@ -35,7 +37,6 @@
 
             <button class="btn btn-dark" type="submit">Comment</button>
         </EditForm>
-        <button type="button" @onclick="socialMediaClient.LogOut">Log out.</button>
     }
     <ul class="list-group">
             @if (hasLoaded)

@@ -10,6 +10,28 @@ a, .btn-link {
     color: #0366d6;
 }
 
+.own-dropdown {
+    position: absolute;
+}
+
+.own-login-dropdown {
+    background-color: whitesmoke;
+    box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
+    padding: 7px;
+}
+
+.microsoft-login-button {
+    background-image: url('../Images/ms-symbollockup_signin_light.svg');
+    background-size: cover;
+    background-repeat: no-repeat;
+    height: 40px;
+    font-size: 100%;
+    font-family: inherit;
+    border: 0;
+    padding: 0;
+    display: block;
+}
+
 .facebook-login-button {
     background-color: #1877F2;
     border: none;
@@ -19,6 +41,7 @@ a, .btn-link {
     border-radius: 5px;
     font-size: 85%;
     margin-left: 3px;
+    display: block;
 }
 
 .facebook-login-button:focus {
@@ -35,6 +58,7 @@ a, .btn-link {
     font-family: inherit;
     border: 0;
     padding: 0;
+    display: block;
 }
 
     .google-login-button:hover {
@@ -216,6 +240,10 @@ app {
 }
 
 @media (max-width: 767.98px) {
+    .own-login-dropdown {
+        right: 0;
+    }
+
     .centered {
         width: 90vw;
     }

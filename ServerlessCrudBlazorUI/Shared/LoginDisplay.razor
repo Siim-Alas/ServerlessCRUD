@@ -1,36 +1,95 @@
 ﻿@using Microsoft.AspNetCore.Components.Authorization
 @using Microsoft.AspNetCore.Components.WebAssembly.Authentication
+@using ServerlessCrudBlazorUI.Services.APIClients
+@using ServerlessCrudBlazorUI.Services.AuthenticationStateProviders
+@using ServerlessCrudBlazorUI.Shared.Utilities
+@using System.Security.Claims
 
 @inject NavigationManager Navigation
 @inject SignOutSessionStateManager SignOutManager
+@inject SocialMediaAuthenticationStateProvider socialMediaAuthStateProvider
+@inject SocialMediaAccountsAPIClient socialMediaClient
 
-<div class="pr-sm-4 navbar navbar-dark">
-    <ul class="nav">
-        <AuthorizeView>
-            <Authorized>
+
+<AuthorizeView>
+    <Authorized>
+        <div class="pr-sm-4 navbar navbar-dark">
+            <ul class="nav">
                 <li class="nav-item">
                     <a class="nav-link btn btn-link" href="authentication/logout" @onclick="BeginLogout">
-                        <span class="hide-on-small-screen">Hello, @context.User.Identity.Name!</span>
+                        <span class="hide-on-small-screen">Hello, @context.User.Identity.Name (admin)!</span>
                         <span class="oi oi-account-logout" aria-hidden="true"></span>
                         <span class="hide-on-small-screen">Log out</span>
                     </a>
                 </li>
-            </Authorized>
-            <NotAuthorized>
-                <li class="nav-item">
-                    <a class="nav-link btn btn-link" href="authentication/login">
-                        <span class="oi oi-account-login" aria-hidden="true"></span>
-                        <span class="hide-on-small-screen">Admin login</span>
-                    </a>
-                </li>
-            </NotAuthorized>
-        </AuthorizeView>
-    </ul>
-</div>
+            </ul>
+        </div>
+    </Authorized>
+    <NotAuthorized>
+        @if (CustomUser.Identity.IsAuthenticated)
+        {
+            <div class="pr-sm-4 navbar navbar-dark">
+                <ul class="nav">
+                    <li class="nav-item">
+                        <a class="nav-link btn btn-link" @onclick="socialMediaAuthStateProvider.SignOutUser">
+                            <span class="hide-on-small-screen">Hello, @CustomUser.Identity.Name!</span>
+                            <span class="oi oi-account-logout" aria-hidden="true"></span>
+                            <span class="hide-on-small-screen">Log out</span>
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        }
+        else
+        {
+            <Dropdown ChildContentClass="own-login-dropdown">
+                <Toggler>
+                    <div class="pr-sm-4 navbar navbar-dark">
+                        <ul class="nav">
+                            <li class="nav-item">
+                                <a class="nav-link btn btn-link">
+                                    <span class="oi oi-account-login" aria-hidden="true"></span>
+                                    <span class="hide-on-small-screen">Login</span>
+                                </a>
+                            </li>
+                        </ul>
+                    </div>
+                </Toggler>
+                <ChildContent>
+                    <div class="text-center">
+                        <button class="google-login-button" type="button" @onclick="socialMediaClient.LogInWithGoogle"></button>
+                        <button class="facebook-login-button" type="button" @onclick="socialMediaClient.LogInWithFacebook">
+                            <img src="Images/f_logo_RGB-White_58.png" width="24" height="24" />&thinsp;
+                            <b class="text-white">Login with Facebook</b>
+                        </button>
+                        <br />
+                        <a class="microsoft-login-button" href="authentication/login"></a>
+                        <p class="text-muted mb-0">(Admins only)</p>
+                    </div>
+                </ChildContent>
+            </Dropdown>
+        }
+    </NotAuthorized>
+</AuthorizeView>
+
 
 @code{
+    private ClaimsPrincipal CustomUser { get; set; }
+
     private async Task BeginLogout(MouseEventArgs args)
     {
         await SignOutManager.SetSignOutState();
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        await base.OnInitializedAsync();
+
+        CustomUser = (await socialMediaAuthStateProvider.GetAuthenticationStateAsync()).User;
+        socialMediaAuthStateProvider.AuthenticationStateChanged += (Task<AuthenticationState> task) =>
+        {
+            CustomUser = task.Result.User;
+            this.StateHasChanged();
+        };
     }
 }
