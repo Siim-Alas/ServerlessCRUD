@@ -1,9 +1,6 @@
-﻿using Microsoft.Azure.Documents;
-using System;
-using System.Collections.Generic;
-using System.Text;
+﻿using ServerlessCrudClassLibrary.TableEntities;
 
-namespace ServerlessCrudClassLibrary
+namespace ServerlessCrudClassLibrary.HttpRequestModels
 {
     public class PostCommentEntityRequest
     {

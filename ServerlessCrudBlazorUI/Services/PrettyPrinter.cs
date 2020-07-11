@@ -164,14 +164,13 @@ namespace ServerlessCrudBlazorUI.Services
                 {
                     // Check if a new tag is being opened.
                     j = 0;
-                    candidateTags = openingMdStrings.Keys.Where(k => k[0] == markdown[i]);
+                    candidateTags = openingMdStrings.Keys;
                     do
                     {
-                        j++;
                         candidateTags = candidateTags
                             .Where(k => j < k.Length)
                             .Where(k => k[j] == markdown[i + j]);
-                    } while (candidateTags.Count() > 0);
+                    } while ((candidateTags.Count() > 0) && (i + ++j < markdown.Length));
 
                     if (openingMdStrings.TryGetValue(markdown.Substring(i, j), out MdEnum tag))
                     {

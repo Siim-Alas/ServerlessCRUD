@@ -1,9 +1,8 @@
 ﻿using Microsoft.Azure.Cosmos.Table;
-using System;
+using ServerlessCrudClassLibrary.TableEntities;
 using System.Collections.Generic;
-using System.Text;
 
-namespace ServerlessCrudClassLibrary
+namespace ServerlessCrudClassLibrary.HttpResponseModels
 {
     public class QueryBlogPostEntitiesResponse
     {

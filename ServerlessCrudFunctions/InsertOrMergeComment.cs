@@ -8,20 +8,18 @@ using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using ServerlessCrudFunctions.Services;
 using Microsoft.Azure.Cosmos.Table;
-using ServerlessCrudClassLibrary;
 using System.Web.Http;
-using System.Linq;
+using ServerlessCrudClassLibrary.HttpRequestModels;
+using ServerlessCrudClassLibrary.HttpResponseModels;
 
 namespace ServerlessCrudFunctions
 {
     public class InsertOrMergeComment
     {
-        private readonly AADJwtService _jwtService;
         private readonly IdentityAPIClient _client;
 
-        public InsertOrMergeComment(AADJwtService service, IdentityAPIClient client)
+        public InsertOrMergeComment(IdentityAPIClient client)
         {
-            _jwtService = service;
             _client = client;
         }
 

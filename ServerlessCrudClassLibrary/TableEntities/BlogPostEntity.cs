@@ -6,7 +6,7 @@ using System.Linq;
 using System.Security.Claims;
 using System.Text.RegularExpressions;
 
-namespace ServerlessCrudClassLibrary
+namespace ServerlessCrudClassLibrary.TableEntities
 {
     public class BlogPostEntity : TableEntity
     {

@@ -1,11 +1,8 @@
-﻿using Microsoft.AspNetCore.Components;
-using Microsoft.JSInterop;
+﻿using Microsoft.JSInterop;
 using ServerlessCrudBlazorUI.Services.AuthenticationStateProviders;
 using ServerlessCrudBlazorUI.Services.JSInteropHelpers;
-using ServerlessCrudClassLibrary;
+using ServerlessCrudClassLibrary.HttpResponseModels;
 using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Net.Http;
 using System.Net.Http.Json;
 using System.Security.Claims;

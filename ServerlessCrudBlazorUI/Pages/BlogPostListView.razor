@@ -1,10 +1,12 @@
 ﻿@page "/blogposts"
 
-@using ServerlessCrudClassLibrary
+@using Blazored.LocalStorage
+@using ServerlessCrudClassLibrary.TableEntities
 @using ServerlessCrudBlazorUI.Services
 @using ServerlessCrudBlazorUI.Services.APIClients
 
 @inject AnnonymousCrudFunctionAPIClient client
+@inject ILocalStorageService localStorage
 
 <div class="main mb-4">
     <div class="content pl-4 pb-4">
@@ -88,6 +90,9 @@
     private (string pk, string rk)[] catalog { get; set; }
     private BlogPostEntity[][] blogPosts { get; set; }
 
+    private DateTime CatalogLastQueried { get; set; }
+    private TableMetadataEntity TableMetadata { get; set; }
+
     private int numOfPages { get { return (int)Math.Ceiling((decimal)(catalog.Length) / (decimal)numberOfEntitiesOnPage); } }
 
     private async Task GoToIndex(int i)
@@ -106,6 +111,8 @@
                     takeCount: numberOfEntitiesOnPage,
                     nextKeys: catalog[i * numberOfEntitiesOnPage]
                 )).BlogPosts.ToArray();
+
+            await localStorage.SetItemAsync("blogPosts", blogPosts);
         }
         index = i;
     }
@@ -114,17 +121,48 @@
     {
         await base.OnInitializedAsync();
 
-        catalog = (from post in (await client.GetQueryBlogPostsResponseAsync(
+        CatalogLastQueried = await localStorage.GetItemAsync<DateTime>("catalogLastQueried");
+        TableMetadata = await client.GetTableMetadataAsync("blogposts");
+
+        string[] partitionKeys = await localStorage.GetItemAsync<string[]>("partitionKeys");
+        string[] rowKeys = await localStorage.GetItemAsync<string[]>("rowKeys");
+
+        if ((partitionKeys == null) ||
+            (rowKeys == null) ||
+            (CatalogLastQueried.Ticks == 0) ||
+            (CatalogLastQueried < TableMetadata.Timestamp))
+        {
+            catalog = (from post in (await client.GetQueryBlogPostsResponseAsync(
                        takeCount: 1000,
                        selectColumns: new List<string>()
                        {
                            "PartitionKey",
                            "RowKey"
-                                   })).BlogPosts
-                   select (post.PartitionKey, post.RowKey))
-                   .ToArray();
+                       })).BlogPosts
+                       select (post.PartitionKey, post.RowKey))
+                       .ToArray();
 
-        blogPosts = new BlogPostEntity[numOfPages][];
+            await localStorage.SetItemAsync("catalogLastQueried", DateTime.UtcNow);
+
+            await localStorage.SetItemAsync(
+                "partitionKeys",
+                from post in catalog
+                select post.pk);
+            await localStorage.SetItemAsync(
+                "rowKeys",
+                from post in catalog
+                select post.rk);
+        }
+        else
+        {
+            catalog = partitionKeys.Zip(rowKeys, (pk, rk) => (pk, rk)).ToArray();
+            blogPosts = await localStorage.GetItemAsync<BlogPostEntity[][]>("blogPosts");
+        }
+
+        if (blogPosts?.Length != numOfPages)
+        {
+            blogPosts = new BlogPostEntity[numOfPages][];
+        }
 
         await GoToIndex(0);
 

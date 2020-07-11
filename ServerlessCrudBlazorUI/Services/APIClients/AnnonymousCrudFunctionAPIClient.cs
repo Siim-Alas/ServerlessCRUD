@@ -1,5 +1,6 @@
 ﻿using Newtonsoft.Json;
-using ServerlessCrudClassLibrary;
+using ServerlessCrudClassLibrary.HttpResponseModels;
+using ServerlessCrudClassLibrary.TableEntities;
 using System;
 using System.Collections.Generic;
 using System.Net.Http;
@@ -70,6 +71,12 @@ namespace ServerlessCrudBlazorUI.Services.APIClients
             {
                 return null;
             }
+        }
+
+        public async Task<TableMetadataEntity> GetTableMetadataAsync(string tableName)
+        {
+            return await _client.GetFromJsonAsync<TableMetadataEntity>(
+                $"GetTableMetadata?tablename={tableName}");
         }
     }
 }

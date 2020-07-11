@@ -1,4 +1,4 @@
-﻿using ServerlessCrudClassLibrary;
+﻿using ServerlessCrudClassLibrary.HttpRequestModels;
 using System;
 using System.Net.Http;
 using System.Net.Http.Json;

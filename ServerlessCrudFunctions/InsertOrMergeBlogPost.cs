@@ -7,10 +7,9 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using Microsoft.Azure.Cosmos.Table;
-using ServerlessCrudClassLibrary;
+using ServerlessCrudClassLibrary.TableEntities;
 using System.Web.Http;
 using ServerlessCrudFunctions.Services;
-using System.Linq;
 
 namespace ServerlessCrudFunctions
 {
@@ -26,7 +25,8 @@ namespace ServerlessCrudFunctions
         [FunctionName("InsertOrMergeBlogPost")]
         public async Task<IActionResult> Run(
             [HttpTrigger(AuthorizationLevel.Anonymous, "post", Route = null)] HttpRequest req,
-            [Table("blogposts", "AzureWebJobsStorage")] CloudTable table,
+            [Table("blogposts", "AzureWebJobsStorage")] CloudTable blogPostsTable,
+            [Table("metadata", "AzureWebJobsStorage")] CloudTable metadataTable,
             ILogger log)
         {
             try
@@ -48,8 +48,13 @@ namespace ServerlessCrudFunctions
                     return new UnauthorizedResult();
                 }
 
+                // Insert or merge the blog post.
                 TableOperation insertOrMergeOperation = TableOperation.InsertOrMerge(blogPost);
-                TableResult result = await table.ExecuteAsync(insertOrMergeOperation);
+                await blogPostsTable.ExecuteAsync(insertOrMergeOperation);
+
+                // Update metadata.
+                TableOperation insertOrMergeMetadata = TableOperation.InsertOrMerge(new TableMetadataEntity("blogposts"));
+                await metadataTable.ExecuteAsync(insertOrMergeMetadata);
 
                 return new OkResult();
             }

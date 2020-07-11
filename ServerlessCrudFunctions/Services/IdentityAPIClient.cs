@@ -1,11 +1,6 @@
-﻿using Microsoft.Extensions.Logging;
-using Newtonsoft.Json;
-using ServerlessCrudClassLibrary;
-using System;
-using System.Collections.Generic;
+﻿using Newtonsoft.Json;
+using ServerlessCrudClassLibrary.HttpResponseModels;
 using System.Net.Http;
-using System.Net.Http.Json;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace ServerlessCrudFunctions.Services

@@ -7,10 +7,9 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using Microsoft.Azure.Cosmos.Table;
-using ServerlessCrudClassLibrary;
 using System.Web.Http;
 using ServerlessCrudFunctions.Services;
-using System.Linq;
+using ServerlessCrudClassLibrary.TableEntities;
 
 namespace ServerlessCrudFunctions
 {
@@ -28,6 +27,7 @@ namespace ServerlessCrudFunctions
             [HttpTrigger(AuthorizationLevel.Anonymous, "post", Route = null)] HttpRequest req,
             [Table("blogposts", "AzureWebJobsStorage")] CloudTable blogPostsTable,
             [Table("comments", "AzureWebJobsStorage")] CloudTable commentsTable,
+            [Table("metadata", "AzureWebJobsStorage")] CloudTable metadataTable,
             ILogger log)
         {
             try
@@ -71,6 +71,10 @@ namespace ServerlessCrudFunctions
                 // Delete the blog post.
                 TableOperation deleteOperation = TableOperation.Delete(blogPost);
                 TableResult result = await blogPostsTable.ExecuteAsync(deleteOperation);
+
+                // Update metadata.
+                TableOperation insertOrMergeMetadata = TableOperation.InsertOrMerge(new TableMetadataEntity("blogposts"));
+                await metadataTable.ExecuteAsync(insertOrMergeMetadata);
 
                 return new OkResult();
             }

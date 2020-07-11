@@ -4,7 +4,7 @@ using System;
 using System.ComponentModel.DataAnnotations;
 using System.Text.RegularExpressions;
 
-namespace ServerlessCrudClassLibrary
+namespace ServerlessCrudClassLibrary.TableEntities
 {
     public class CommentEntity : TableEntity
     {

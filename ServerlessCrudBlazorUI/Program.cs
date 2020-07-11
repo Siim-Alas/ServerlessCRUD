@@ -10,6 +10,7 @@ using System.Net.Http;
 using System;
 using Microsoft.AspNetCore.Components.WebAssembly.Authentication;
 using Microsoft.AspNetCore.Components;
+using Blazored.LocalStorage;
 
 namespace ServerlessCrudBlazorUI
 {
@@ -21,6 +22,7 @@ namespace ServerlessCrudBlazorUI
             builder.RootComponents.Add<App>("app");
 
             builder.Services.AddBlazoredSessionStorage();
+            builder.Services.AddBlazoredLocalStorage();
             builder.Services.AddScoped<SocialMediaAuthenticationStateProvider>();
 
             builder.Services.AddTransient(options => {
@@ -48,7 +50,7 @@ namespace ServerlessCrudBlazorUI
             builder.Services.AddSingleton(options => {
                 return new HttpClient() { BaseAddress = new Uri("https://serverlesscrud.azurewebsites.net/api/") };
             });
-            builder.Services.AddSingleton<AnnonymousCrudFunctionAPIClient>();
+            builder.Services.AddScoped<AnnonymousCrudFunctionAPIClient>();
             builder.Services.AddSingleton<AuthenticatedCrudFunctionAPIClient>();
             builder.Services.AddScoped<SocialMediaAccountsAPIClient>();
             builder.Services.AddTransient(options => {

@@ -6,37 +6,37 @@ using Microsoft.Azure.WebJobs.Extensions.Http;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
 using Microsoft.Azure.Cosmos.Table;
-using System.Web.Http;
 using ServerlessCrudClassLibrary.TableEntities;
+using System.Web.Http;
 
 namespace ServerlessCrudFunctions
 {
-    public class GetBlogPost
+    public class GetTableMetadata
     {
-        public GetBlogPost()
+        public GetTableMetadata()
         {
 
         }
 
-        [FunctionName("GetBlogPost")]
+        [FunctionName("GetTableMetadata")]
         public async Task<IActionResult> Run(
             [HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = null)] HttpRequest req,
-            [Table("blogposts", "AzureWebJobsStorage")] CloudTable table,
+            [Table("metadata", "AzureWebJobsStorage")] CloudTable table,
             ILogger log)
         {
             try
             {
-                TableResult result = await table.ExecuteAsync(TableOperation.Retrieve<BlogPostEntity>(
-                    req.Query["partitionkey"], 
-                    req.Query["rowkey"]));
+                TableResult result = await table.ExecuteAsync(TableOperation.Retrieve<TableMetadataEntity>(
+                    req.Query["tablename"],
+                    "metadata"));
 
-                log.LogInformation($"function GetBlogPost -- got response '{result.HttpStatusCode}' from table '{table.Name}'.");
+                log.LogInformation($"function GetTableMetadata -- got response '{result.HttpStatusCode}' from table '{table.Name}'.");
 
                 return new OkObjectResult(result.Result);
             }
             catch (Exception e)
             {
-                log.LogError($"function GetBlogPost -- caught exception {e} {e.Message} {e.StackTrace}");
+                log.LogError($"function GetTableMetadata -- caught exception {e} {e.Message} {e.StackTrace}");
                 return new InternalServerErrorResult();
             }
         }
