@@ -59,7 +59,7 @@ namespace ServerlessCrudBlazorUI
                     new HttpClient(options.GetRequiredService<AuthorizedAuthorizationMessageHandler>()));
             });
 
-            builder.Services.AddScoped<BlogPostService>();
+            builder.Services.AddTransient<BlogPostService>();
 
             builder.Services.AddMsalAuthentication(options =>
             {
