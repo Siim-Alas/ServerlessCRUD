@@ -11,6 +11,7 @@ using System;
 using Microsoft.AspNetCore.Components.WebAssembly.Authentication;
 using Microsoft.AspNetCore.Components;
 using Blazored.LocalStorage;
+using ServerlessCrudBlazorUI.Services;
 
 namespace ServerlessCrudBlazorUI
 {
@@ -57,6 +58,8 @@ namespace ServerlessCrudBlazorUI
                 return new AuthorizedCrudFunctionAPIClient(
                     new HttpClient(options.GetRequiredService<AuthorizedAuthorizationMessageHandler>()));
             });
+
+            builder.Services.AddScoped<BlogPostService>();
 
             builder.Services.AddMsalAuthentication(options =>
             {

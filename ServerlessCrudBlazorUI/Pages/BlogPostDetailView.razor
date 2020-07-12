@@ -5,7 +5,7 @@
 @using ServerlessCrudBlazorUI.Services
 @using ServerlessCrudBlazorUI.Services.APIClients
 
-@inject AnnonymousCrudFunctionAPIClient client
+@inject BlogPostService blogPostService
 @inject AuthenticationStateProvider authStateProvider
 
 <div class="main mb-4">
@@ -73,9 +73,7 @@
     {
         await base.OnParametersSetAsync();
 
-        blogPost = await client.GetBlogPostEntityAsync(
-            PrettyPrinter.BlogPostPartitionKeyFromDateString(DateString),
-            RowKey);
+        blogPost = await blogPostService.GetBlogPostAsync(RowKey);
 
         hasLoaded = true;
     }

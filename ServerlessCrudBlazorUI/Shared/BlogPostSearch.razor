@@ -1,11 +1,11 @@
 ﻿@using ServerlessCrudBlazorUI.Services
 
-@if (Catalog != null)
+@if (PartitionKeys != null)
 {
     <div class="input-group">
         <select class="form-control border-right-0 border" @bind="SelectedPartitionKey">
             <option></option>
-            @foreach (string pk in Catalog.Select(post => post.PartitionKey).Distinct())
+            @foreach (string pk in PartitionKeys.Distinct())
             {
                 <option value="@pk">@PrettyPrinter.DateStringFromBlogPostPartitionKey(pk)</option>
             }
@@ -48,7 +48,9 @@
 
 @code {
     [Parameter]
-    public (string PartitionKey, string RowKey)[] Catalog { get; set; }
+    public string[] PartitionKeys { get; set; }
+    [Parameter]
+    public string[] RowKeys { get; set; }
 
     private string SelectedPartitionKey { get; set; }
     private string SearchText { get; set; }
@@ -56,7 +58,8 @@
     {
         get
         {
-            return from post in Catalog
+            IEnumerable<(string PartitionKey, string RowKey)> catalog = PartitionKeys.Zip(RowKeys, (pk, rk) => (pk, rk));
+            return from post in catalog
                    where
                    (post.PartitionKey == SelectedPartitionKey) || string.IsNullOrEmpty(SelectedPartitionKey)
                    where

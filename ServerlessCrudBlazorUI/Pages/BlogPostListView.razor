@@ -3,9 +3,8 @@
 @using Blazored.LocalStorage
 @using ServerlessCrudClassLibrary.TableEntities
 @using ServerlessCrudBlazorUI.Services
-@using ServerlessCrudBlazorUI.Services.APIClients
 
-@inject AnnonymousCrudFunctionAPIClient client
+@inject BlogPostService blogPostService
 @inject ILocalStorageService localStorage
 
 <div class="main mb-4">
@@ -15,7 +14,7 @@
         @if (hasInitialized)
         {
             <ul class="list-group">
-                @foreach (BlogPostEntity post in blogPosts[index])
+                @foreach (BlogPostEntity post in blogPostsOnPage)
                 {
                     <NavLink class="list-group-item  list-group-item-action"
                              href="@($"/detail/{PrettyPrinter.DateStringFromBlogPostPartitionKey(post.PartitionKey)}/{post.RowKey}")">
@@ -38,32 +37,32 @@
 
             <ul class="pagination justify-content-center">
                 <li class="page-item  @((index == 0) ? "disabled" : "")">
-                    <button class="page-link" type="button" @onclick="@(async () => await GoToIndex(0))">
+                    <button class="page-link" type="button" @onclick="@(async () => await GoToPage(0))">
                         <i class="fa fa-angle-double-left"></i>
                     </button>
                 </li>
                 <li class="page-item @((index == 0) ? "disabled" : "")">
-                    <button class="page-link" type="button" @onclick="@(async () => await GoToIndex(index - 1))">
+                    <button class="page-link" type="button" @onclick="@(async () => await GoToPage(index - 1))">
                         <i class="fa fa-angle-left"></i>
                     </button>
                 </li>
 
-                @for (int i = (index < radiusOfPages) ? 0 : index - radiusOfPages; i <= ((index + radiusOfPages < numOfPages) ? index + radiusOfPages : numOfPages - 1); i++)
+                @for (int i = (index < radiusOfPages) ? 0 : index - radiusOfPages; i <= ((index + radiusOfPages < blogPostService.NumOfPages) ? index + radiusOfPages : blogPostService.NumOfPages - 1); i++)
                 {
                     // Workaround, since i gets incremented, but a is declared local to the loop.
                     int a = i;
                     <li class="page-item @((i == index) ? "active" : "")">
-                        <button class="page-link" type="button" @onclick="@(async() => await GoToIndex(a))">@(i + 1)</button>
+                        <button class="page-link" type="button" @onclick="@(async() => await GoToPage(a))">@(i + 1)</button>
                     </li>
                 }
 
-                <li class="page-item @((index + 1 < numOfPages) ? "" : "disabled")">
-                    <button class="page-link" type="button" @onclick="@(async() => await GoToIndex(index + 1))">
+                <li class="page-item @((index + 1 < blogPostService.NumOfPages) ? "" : "disabled")">
+                    <button class="page-link" type="button" @onclick="@(async() => await GoToPage(index + 1))">
                         <i class="fa fa-angle-right"></i>
                     </button>
                 </li>
-                <li class="page-item @((index + 1 < numOfPages) ? "" : "disabled")">
-                    <button class="page-link" type="button" @onclick="@(async() => await GoToIndex(numOfPages - 1))">
+                <li class="page-item @((index + 1 < blogPostService.NumOfPages) ? "" : "disabled")">
+                    <button class="page-link" type="button" @onclick="@(async() => await GoToPage(blogPostService.NumOfPages - 1))">
                         <i class="fa fa-angle-double-right"></i>
                     </button>
                 </li>
@@ -78,42 +77,20 @@
     </div>
 </div>
 <Sidebar>
-    <BlogPostSearch Catalog="catalog" />
+    <BlogPostSearch PartitionKeys="blogPostService.PartitionKeys" RowKeys="blogPostService.RowKeys" />
 </Sidebar>
 
 @code {
     private bool hasInitialized = false;
-    private readonly static int numberOfEntitiesOnPage = 2;
     private readonly static int radiusOfPages = 2;
 
     private int index { get; set; } = 0;
-    private (string pk, string rk)[] catalog { get; set; }
-    private BlogPostEntity[][] blogPosts { get; set; }
+    private BlogPostEntity[] blogPostsOnPage { get; set; }
 
-    private DateTime CatalogLastQueried { get; set; }
-    private TableMetadataEntity TableMetadata { get; set; }
-
-    private int numOfPages { get { return (int)Math.Ceiling((decimal)(catalog.Length) / (decimal)numberOfEntitiesOnPage); } }
-
-    private async Task GoToIndex(int i)
+    private async Task GoToPage(int i)
     {
-        if (blogPosts[i] == null)
-        {
-            blogPosts[i] = (await client.GetQueryBlogPostsResponseAsync(
-                    selectColumns: new List<string>()
-                    {
-                        "PartitionKey",
-                        "RowKey",
-                        "Timestamp",
-                        "Author",
-                        "Text"
-                            },
-                    takeCount: numberOfEntitiesOnPage,
-                    nextKeys: catalog[i * numberOfEntitiesOnPage]
-                )).BlogPosts.ToArray();
+        blogPostsOnPage = await blogPostService.GetBlogPostsOnPageAsync(i);
 
-            await localStorage.SetItemAsync("blogPosts", blogPosts);
-        }
         index = i;
     }
 
@@ -121,50 +98,7 @@
     {
         await base.OnInitializedAsync();
 
-        CatalogLastQueried = await localStorage.GetItemAsync<DateTime>("catalogLastQueried");
-        TableMetadata = await client.GetTableMetadataAsync("blogposts");
-
-        string[] partitionKeys = await localStorage.GetItemAsync<string[]>("partitionKeys");
-        string[] rowKeys = await localStorage.GetItemAsync<string[]>("rowKeys");
-
-        if ((partitionKeys == null) ||
-            (rowKeys == null) ||
-            (CatalogLastQueried.Ticks == 0) ||
-            (CatalogLastQueried < TableMetadata.Timestamp))
-        {
-            catalog = (from post in (await client.GetQueryBlogPostsResponseAsync(
-                       takeCount: 1000,
-                       selectColumns: new List<string>()
-                       {
-                           "PartitionKey",
-                           "RowKey"
-                       })).BlogPosts
-                       select (post.PartitionKey, post.RowKey))
-                       .ToArray();
-
-            await localStorage.SetItemAsync("catalogLastQueried", DateTime.UtcNow);
-
-            await localStorage.SetItemAsync(
-                "partitionKeys",
-                from post in catalog
-                select post.pk);
-            await localStorage.SetItemAsync(
-                "rowKeys",
-                from post in catalog
-                select post.rk);
-        }
-        else
-        {
-            catalog = partitionKeys.Zip(rowKeys, (pk, rk) => (pk, rk)).ToArray();
-            blogPosts = await localStorage.GetItemAsync<BlogPostEntity[][]>("blogPosts");
-        }
-
-        if (blogPosts?.Length != numOfPages)
-        {
-            blogPosts = new BlogPostEntity[numOfPages][];
-        }
-
-        await GoToIndex(0);
+        await GoToPage(0);
 
         hasInitialized = true;
     }
