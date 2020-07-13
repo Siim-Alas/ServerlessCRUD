@@ -60,6 +60,7 @@ namespace ServerlessCrudBlazorUI
             });
 
             builder.Services.AddTransient<BlogPostService>();
+            builder.Services.AddSingleton<DocumentEditor>();
 
             builder.Services.AddMsalAuthentication(options =>
             {

@@ -13,7 +13,7 @@ namespace ServerlessCrudBlazorUI.Services.JSInteropHelpers
         /// The delegate for the .NET method to be invoked by Javascript.
         /// </summary>
         /// <param name="args">The arguments supplied by Javascript to the .NET method.</param>
-        public delegate Task Callback(object[] args);
+        public delegate Task Callback(params object[] args);
         /// <summary>
         /// Creates a new CallbackHelper instance.
         /// </summary>
@@ -31,7 +31,7 @@ namespace ServerlessCrudBlazorUI.Services.JSInteropHelpers
         /// </summary>
         /// <param name="args">The arguments to be passed to the CallbackMethod supplied in the constructor.</param>
         [JSInvokable]
-        public async Task InvokeCallback(object[] args)
+        public async Task InvokeCallback(params object[] args)
         {
             await CallbackMethod(args);
         }

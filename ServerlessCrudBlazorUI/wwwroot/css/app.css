@@ -10,6 +10,13 @@ a, .btn-link {
     color: #0366d6;
 }
 
+.text-editor {
+    background-color: #fff;
+    min-height: 50vh;
+    border: 1px solid #ced4da;
+    border-radius: 5px;
+}
+
 .own-dropdown {
     position: absolute;
 }

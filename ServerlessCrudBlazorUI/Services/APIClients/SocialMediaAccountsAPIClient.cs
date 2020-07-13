@@ -39,7 +39,7 @@ namespace ServerlessCrudBlazorUI.Services.APIClients
             await _JSRuntime.InvokeVoidAsync("FacebookClient.logOut");
             await _socialMediaAuthStateProvider.SignOutUser();
         }
-        public async Task FacebookAuthCallback(object[] args)
+        public async Task FacebookAuthCallback(params object[] args)
         {
             await _socialMediaAuthStateProvider.SignInUser(
                 SocialMediaAuthenticationStateProvider.FacebookAuthenticationType, 
@@ -61,7 +61,7 @@ namespace ServerlessCrudBlazorUI.Services.APIClients
             await _JSRuntime.InvokeVoidAsync("GoogleClient.logOut");
             await _socialMediaAuthStateProvider.SignOutUser();
         }
-        public async Task GoogleAuthCallback(object[] args)
+        public async Task GoogleAuthCallback(params object[] args)
         {
             await _socialMediaAuthStateProvider.SignInUser(
                 SocialMediaAuthenticationStateProvider.GoogleAuthenticationType, 
