@@ -1,4 +1,6 @@
-﻿using Microsoft.Azure.Cosmos.Table;
+﻿using Microsoft.AspNetCore.Components;
+using Microsoft.Azure.Cosmos.Table;
+using Microsoft.Azure.Documents.SystemFunctions;
 using Newtonsoft.Json;
 using System;
 using System.ComponentModel.DataAnnotations;
@@ -20,12 +22,12 @@ namespace ServerlessCrudClassLibrary.TableEntities
         /// <param name="author">The author of the post, saved in RowKey (REVERSETICKS_AUTHOROID_TITLE).</param>
         /// <param name="title">The title of the post, saved in the RowKey (REVERSETICKS_AUTHOROID_TITLE).</param>
         /// <param name="text">The text of the post.</param>
-        public BlogPostEntity(ClaimsPrincipal author, string title, string text)
+        public BlogPostEntity(ClaimsPrincipal author, string title, MarkupString content)
         {
             PartitionKey = $"{9999 - DateTime.UtcNow.Year}{99 - DateTime.UtcNow.Month}";
             SetRowKey(author.FindFirst("oid").Value, title);
             Author = author.Identity.Name;
-            Text = text;
+            Text = content.Value;
         }
         /// <summary>
         /// Gets or sets the display name for the author of the post.

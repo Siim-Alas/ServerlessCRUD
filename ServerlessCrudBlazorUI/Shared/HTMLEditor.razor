@@ -1,155 +1,56 @@
 ﻿@using ServerlessCrudBlazorUI.Services
 
-@inject DocumentEditor DocumentEditor
+@inject QuillClient Quill
 
-<!-- HTML Editor -->
-<div>
-    <!-- Toolbar -->
-    <div>
-        <select @bind="@SelectedFormat" @oninput="OnFormatSelected">
-            <option value="none">- Format -</option>
-            @foreach (KeyValuePair<string, string> format in DocumentEditor.Formats)
-            {
-                <option value="@format.Value">@format.Key</option>
-            }
-        </select>
-        <select @bind="@SelectedFont" @oninput="OnFontSelected">
-            <option value="none">- Font -</option>
-            @foreach (string font in DocumentEditor.Fonts)
-            {
-                <option>@font</option>
-            }
-        </select>
-        <select @bind="@SelectedFontSize" @oninput="OnFontSizeSelected">
-            <option value="none">- Font Size -</option>
-            @foreach (string size in DocumentEditor.FontSizes)
-            {
-                <option>@size</option>
-            }
-        </select>
-        <select @bind="@SelectedFontColor" @oninput="OnFontColorSelected">
-            <option value="none">- Font Color -</option>
-            @foreach (string color in DocumentEditor.Colors)
-            {
-                <option>@color</option>
-            }
-        </select>
-        <select @bind="@SelectedBackgroundColor" @oninput="OnBackgroundColorSelected">
-            <option value="none">- Background Color -</option>
-            @foreach (string color in DocumentEditor.Colors)
-            {
-                <option>@color</option>
-            }
-        </select>
-
-        <button type="button"
-                @onclick="@(async() => { await DocumentEditor.ExecEditCommand(DocumentEditor.Commands.bold); })">
-            <i class="fa fa-bold"></i>
-        </button>
-        <button type="button"
-                @onclick="@(async() => { await DocumentEditor.ExecEditCommand(DocumentEditor.Commands.italic); })">
-            <i class="fa fa-italic"></i>
-        </button>
-        <button type="button"
-                @onclick="@(async() => { await DocumentEditor.ExecEditCommand(DocumentEditor.Commands.underline); })">
-            <i class="fa fa-underline"></i>
-        </button>
-        <button type="button"
-                @onclick="@(async() => { await DocumentEditor.ExecEditCommand(DocumentEditor.Commands.justifyLeft); })">
-            <i class="fa fa-align-left"></i>
-        </button>
-        <button type="button"
-                @onclick="@(async() => { await DocumentEditor.ExecEditCommand(DocumentEditor.Commands.justifyCenter); })">
-            <i class="fa fa-align-center"></i>
-        </button>
-        <button type="button"
-                @onclick="@(async() => { await DocumentEditor.ExecEditCommand(DocumentEditor.Commands.justifyRight); })">
-            <i class="fa fa-align-right"></i>
-        </button>
-        <button type="button"
-                @onclick="@(async() => { await DocumentEditor.ExecEditCommand(DocumentEditor.Commands.justifyFull); })">
-            <i class="fa fa-align-justify"></i>
-        </button>
-        <button type="button"
-                @onclick="@(async() => { await DocumentEditor.ExecEditCommand(DocumentEditor.Commands.insertOrderedList); })">
-            <i class="fa fa-list-ol"></i>
-        </button>
-        <button type="button"
-                @onclick="@(async() => { await DocumentEditor.ExecEditCommand(DocumentEditor.Commands.insertUnorderedList); })">
-            <i class="fa fa-list-ul"></i>
-        </button>
-        <button type="button"
-                @onclick="@(async() => { await DocumentEditor.ExecEditCommand(DocumentEditor.Commands.formatBlock, "blockquote"); })">
-            <i class="fa fa-quote-left"></i>
-        </button>
-        <button type="button"
-                @onclick="@(async() => { await DocumentEditor.ExecEditCommand(DocumentEditor.Commands.outdent); })">
-            <i class="fa fa-outdent"></i>
-        </button>
-        <button type="button"
-                @onclick="@(async() => { await DocumentEditor.ExecEditCommand(DocumentEditor.Commands.indent); })">
-            <i class="fa fa-indent"></i>
-        </button>
-        <!-- TODO: Links -->
-        <button type="button"
-                @onclick="@(async() => { await DocumentEditor.ExecEditCommand(DocumentEditor.Commands.cut); })">
-            <i class="fa fa-cut"></i>
-        </button>
-        <button type="button"
-                @onclick="@(async() => { await DocumentEditor.ExecEditCommand(DocumentEditor.Commands.copy); })">
-            <i class="fa fa-copy"></i>
-        </button>
-        <button type="button"
-                @onclick="@(async() => { await DocumentEditor.ExecEditCommand(DocumentEditor.Commands.paste); })">
-            <i class="fa fa-paste"></i>
-        </button>
-        <button type="button"
-                @onclick="@(async() => { await DocumentEditor.ExecEditCommand(DocumentEditor.Commands.undo); })">
-            <i class="fa fa-undo"></i>
-        </button>
-        <button type="button"
-                @onclick="@(async() => { await DocumentEditor.ExecEditCommand(DocumentEditor.Commands.redo); })">
-            <i class="fa fa-repeat"></i>
-        </button>
-    </div>
-    <!-- Text Editor -->
-    <div class="text-editor" contenteditable="true">
-        bla
-    </div>
+<div @ref="ToolbarReference">
+    <select class="ql-header">
+        <option selected=""></option>
+        <option value="1"></option>
+        <option value="2"></option>
+        <option value="3"></option>
+        <option value="4"></option>
+        <option value="5"></option>
+    </select>
+    <span class="ql-formats">
+        <button class="ql-bold"></button>
+        <button class="ql-italic"></button>
+        <button class="ql-underline"></button>
+        <button class="ql-strike"></button>
+    </span>
+    <span class="ql-formats">
+        <select class="ql-color"></select>
+        <select class="ql-background"></select>
+    </span>
+    <span class="ql-formats">
+        <button class="ql-list" value="ordered"></button>
+        <button class="ql-list" value="bullet"></button>
+    </span>
+    <span class="ql-formats">
+        <button class="ql-link"></button>
+    </span>
+</div>
+<div class="text-editor" @ref="EditorReference">
+    @Content
 </div>
 
 @code {
-    private string SelectedFormat { get; set; } = "none";
-    private string SelectedFont { get; set; } = "none";
-    private string SelectedFontSize { get; set; } = "none";
-    private string SelectedFontColor { get; set; } = "none";
-    private string SelectedBackgroundColor { get; set; } = "none";
+    [Parameter]
+    public MarkupString Content { get; set; }
 
-    #region SelectCallbacks
-    private async Task OnFormatSelected(ChangeEventArgs args)
+    private ElementReference ToolbarReference { get; set; }
+    private ElementReference EditorReference { get; set; }
+
+    public async Task<MarkupString> GetInnerHTML()
     {
-        await DocumentEditor.ExecEditCommand(DocumentEditor.Commands.formatBlock, args.Value.ToString());
-        SelectedFormat = "none";
+        return await Quill.GetHTML(EditorReference);
     }
-    private async Task OnFontSelected(ChangeEventArgs args)
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
     {
-        await DocumentEditor.ExecEditCommand(DocumentEditor.Commands.fontName, args.Value.ToString());
-        SelectedFont = "none";
+        await base.OnAfterRenderAsync(firstRender);
+        if (firstRender)
+        {
+            await Quill.InitAsync(ToolbarReference, EditorReference);
+        }
     }
-    private async Task OnFontSizeSelected(ChangeEventArgs args)
-    {
-        await DocumentEditor.ExecEditCommand(DocumentEditor.Commands.fontSize, args.Value.ToString());
-        SelectedFontSize = "none";
-    }
-    private async Task OnFontColorSelected(ChangeEventArgs args)
-    {
-        await DocumentEditor.ExecEditCommand(DocumentEditor.Commands.foreColor, args.Value.ToString());
-        SelectedFontColor = "none";
-    }
-    private async Task OnBackgroundColorSelected(ChangeEventArgs args)
-    {
-        await DocumentEditor.ExecEditCommand(DocumentEditor.Commands.backColor, args.Value.ToString());
-        SelectedBackgroundColor = "none";
-    }
-    #endregion
 }

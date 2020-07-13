@@ -37,7 +37,7 @@
                 }
                 <div class="form-group">
                     <label for="text">Text</label>
-                    <InputTextArea id="text" class="form-control" rows="20" @bind-Value="blogPost.Text"></InputTextArea>
+                    <HTMLEditor @ref="Editor" Content="(MarkupString)blogPost.Text" />
                 </div>
 
                 <button class="btn btn-dark" type="submit">Submit</button>
@@ -50,62 +50,18 @@
         }
     </div>
 </div>
-<Sidebar>
-    <table class="table">
-        <thead>
-            <tr>
-                <th scope="col">Markdown</th>
-                <th scope="col">Result</th>
-            </tr>
-        </thead>
-        <tbody>
-            <tr>
-                <td>*italic* or _italic_</td>
-                <td>@PrettyPrinter.ParseMarkdownToHTML("_italic_")</td>
-            </tr>
-            <tr>
-                <td>**bold** or __bold__</td>
-                <td>@PrettyPrinter.ParseMarkdownToHTML("__bold__")</td>
-            </tr>
-            <tr>
-                <td>*__super important__* <small>or any combination of the two</small></td>
-                <td>@PrettyPrinter.ParseMarkdownToHTML("___super important___")</td>
-            </tr>
-            <tr>
-                <td># Heading 1\n</td>
-                <td>@PrettyPrinter.ParseMarkdownToHTML("# Heading 1\n")</td>
-            </tr>
-            <tr>
-                <td>## Heading 2\n</td>
-                <td>@PrettyPrinter.ParseMarkdownToHTML("# Heading 2\n")</td>
-            </tr>
-            <tr>
-                <td>[Link text](https://www.google.com/)</td>
-                <td>@PrettyPrinter.ParseMarkdownToHTML("[Link text](https://www.google.com/)")</td>
-            </tr>
-            <tr>
-                <td>![Image](favicon.ico)</td>
-                <td>@PrettyPrinter.ParseMarkdownToHTML("![Image](favicon.ico)")</td>
-            </tr>
-            <tr>
-                <td>---\n</td>
-                <td>@PrettyPrinter.ParseMarkdownToHTML("---\n")</td>
-            </tr>
-            <tr>
-                <td>`code`</td>
-                <td>@PrettyPrinter.ParseMarkdownToHTML("`code`")</td>
-            </tr>
-        </tbody>
-    </table>
-</Sidebar>
+<Sidebar />
 
 @code {
+    private HTMLEditor Editor { get; set; }
+
     private BlogPostEntity blogPost { get; set; }
     private bool blogPostAlreadyExists { get; set; } = false;
     private bool hasInitialized { get; set; } = false;
 
     private async Task OnValidSubmit()
     {
+        blogPost.Text = (await Editor.GetInnerHTML()).Value;
         if (blogPost.IsValid)
         {
             await JsRuntime.InvokeVoidAsync(
@@ -151,7 +107,7 @@
             blogPost = new BlogPostEntity(
                 (await authStateProvider.GetAuthenticationStateAsync()).User,
                 "title",
-                "...");
+                (MarkupString)"<p>...</p>");
         }
 
         hasInitialized = true;

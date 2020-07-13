@@ -21,14 +21,7 @@
                 </p>
             </div>
             <div>
-                @try
-                {
-                    <div class="multiline">@PrettyPrinter.ParseMarkdownToHTML(blogPost.Text)</div>
-                }
-                catch (ArgumentException)
-                {
-                    <div class="multiline">@blogPost.Text</div>
-                }
+                <div class="multiline">@((MarkupString)blogPost.Text)</div>
             </div>
             @if (userOID == blogPost.AuthorOID)
             {

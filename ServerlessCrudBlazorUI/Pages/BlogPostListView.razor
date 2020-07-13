@@ -28,7 +28,7 @@
                         </div>
                         <div class="">
                             <p class="">
-                                @((post.Text.Length < 300) ? post.Text : $"{post.Text.Substring(0, 300)} ...")
+                                @((MarkupString)((post.Text.Length < 300) ? post.Text : $"{post.Text.Substring(0, 300)} ..."))
                             </p>
                         </div>
                     </NavLink>
