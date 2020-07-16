@@ -11,7 +11,7 @@ using System.Web.Http;
 using ServerlessCrudFunctions.Services;
 using ServerlessCrudClassLibrary.TableEntities;
 
-namespace ServerlessCrudFunctions
+namespace ServerlessCrudFunctions.BlogPosts
 {
     public class DeleteBlogPost
     {

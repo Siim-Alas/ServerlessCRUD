@@ -9,7 +9,7 @@ using System.Web.Http;
 using Microsoft.Azure.Cosmos.Table;
 using ServerlessCrudClassLibrary.TableEntities;
 
-namespace ServerlessCrudFunctions
+namespace ServerlessCrudFunctions.Comments
 {
     public class GetCommentsOnBlogPost
     {

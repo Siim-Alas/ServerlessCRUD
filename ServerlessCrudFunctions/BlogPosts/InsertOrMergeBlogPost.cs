@@ -11,7 +11,7 @@ using ServerlessCrudClassLibrary.TableEntities;
 using System.Web.Http;
 using ServerlessCrudFunctions.Services;
 
-namespace ServerlessCrudFunctions
+namespace ServerlessCrudFunctions.BlogPosts
 {
     public class InsertOrMergeBlogPost
     {

@@ -12,7 +12,7 @@ using Microsoft.Azure.Cosmos.Table;
 using System.Web.Http;
 using ServerlessCrudClassLibrary.HttpResponseModels;
 
-namespace ServerlessCrudFunctions
+namespace ServerlessCrudFunctions.BlogPosts
 {
     public class QueryBlogPosts
     {

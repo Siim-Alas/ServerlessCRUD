@@ -16,7 +16,7 @@ namespace ServerlessCrudBlazorUI.Services.APIClients
         private readonly IJSRuntime _JSRuntime;
         private readonly SocialMediaAuthenticationStateProvider _socialMediaAuthStateProvider;
 
-        private DotNetObjectReference<CallbackHelper> _callbackReference;
+        private DotNetObjectReference<VoidCallbackHelper> _callbackReference;
 
         public SocialMediaAccountsAPIClient(
             HttpClient client, 
@@ -31,7 +31,7 @@ namespace ServerlessCrudBlazorUI.Services.APIClients
         #region Facebook
         public async Task LogInWithFacebook()
         {
-            _callbackReference = DotNetObjectReference.Create(new CallbackHelper(FacebookAuthCallback));
+            _callbackReference = DotNetObjectReference.Create(new VoidCallbackHelper(FacebookAuthCallback));
             await _JSRuntime.InvokeVoidAsync("FacebookClient.logIn", _callbackReference);
         }
         public async Task LogOutWithFacebook()
@@ -53,7 +53,7 @@ namespace ServerlessCrudBlazorUI.Services.APIClients
         #region Google
         public async Task LogInWithGoogle()
         {
-            _callbackReference = DotNetObjectReference.Create(new CallbackHelper(GoogleAuthCallback));
+            _callbackReference = DotNetObjectReference.Create(new VoidCallbackHelper(GoogleAuthCallback));
             await _JSRuntime.InvokeVoidAsync("GoogleClient.logIn", _callbackReference);
         }
         public async Task LogOutWithGoogle()

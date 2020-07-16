@@ -1,9 +1,11 @@
-﻿using Newtonsoft.Json;
+﻿using BlazorInputFile;
+using Newtonsoft.Json;
 using ServerlessCrudClassLibrary.HttpResponseModels;
 using ServerlessCrudClassLibrary.TableEntities;
 using System;
 using System.Collections.Generic;
 using System.Net.Http;
+using System.Net.Http.Headers;
 using System.Net.Http.Json;
 using System.Threading.Tasks;
 
@@ -18,6 +20,22 @@ namespace ServerlessCrudBlazorUI.Services.APIClients
             _client = client;
             //_client.BaseAddress = new Uri("https://serverlesscrud.azurewebsites.net/api/");
         }
+        // Temp
+        public async Task<HttpResponseMessage> PostImageAsync(IFileListEntry file)
+        {
+            try
+            {
+                StreamContent content = new StreamContent(file.Data);
+                content.Headers.ContentType = new MediaTypeHeaderValue(file.Type);
+                return await _client.PostAsync($"UploadImage/{file.Name}", content);
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e);
+                return new HttpResponseMessage(System.Net.HttpStatusCode.BadRequest);
+            }
+        }
+        // EndTemp
 
         public async Task<QueryBlogPostEntitiesResponse> GetQueryBlogPostsResponseAsync(
             int skip = 0,

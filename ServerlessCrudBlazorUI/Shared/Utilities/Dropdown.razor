@@ -1,12 +1,12 @@
 ﻿
-<div>
-    <div class="@TogglerClass" @onclick="ToggleContent">
+<span class="own-dropdown-container">
+    <span class="@TogglerClass" @onclick="ToggleContent">
         @Toggler
-    </div>
-    <div class="own-dropdown @ChildContentClass" style="display:@(ShowContent ? "block" : "none");">
+    </span>
+    <span class="own-dropdown @ChildContentClass" style="display:@(ShowContent ? "block" : "none");">
         @ChildContent
-    </div>
-</div>
+    </span>
+</span>
 
 @code {
     [Parameter]
@@ -19,7 +19,7 @@
     [Parameter]
     public string ChildContentClass { get; set; }
 
-    private bool ShowContent { get; set; } = false;
+    public bool ShowContent { get; set; } = false;
 
     private void ToggleContent()
     {

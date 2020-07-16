@@ -25,7 +25,7 @@ namespace ServerlessCrudBlazorUI.Services.AuthenticationStateProviders
                     { 
                         new Claim("name", (await _sessionStorage.GetItemAsync<string>("customAuthStateProviderUserName")) ?? ""),
                         new Claim("userId", (await _sessionStorage.GetItemAsync<string>("customAuthStateProviderUserId")) ?? ""), 
-                        new Claim("accessToken", (await _sessionStorage.GetItemAsync<string>("customAuthStateProviderToken")) ?? "")
+                        new Claim("token", (await _sessionStorage.GetItemAsync<string>("customAuthStateProviderToken")) ?? "")
                     }, 
                     await _sessionStorage.GetItemAsync<string>("customAuthStateProviderAuthType"), 
                     "name", 

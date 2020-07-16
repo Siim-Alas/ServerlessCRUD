@@ -12,7 +12,7 @@ using System.Web.Http;
 using ServerlessCrudClassLibrary.HttpRequestModels;
 using ServerlessCrudClassLibrary.HttpResponseModels;
 
-namespace ServerlessCrudFunctions
+namespace ServerlessCrudFunctions.Comments
 {
     public class InsertOrMergeComment
     {

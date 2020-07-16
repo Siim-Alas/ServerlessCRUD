@@ -20,8 +20,8 @@
                     <small>By @blogPost.Author &mdash; Last updated: @blogPost.Timestamp.ToLocalTime().ToString("HH:mm d MMMM yyyy")</small>
                 </p>
             </div>
-            <div>
-                <div class="multiline">@((MarkupString)blogPost.Text)</div>
+            <div class="blog-post">
+                @((MarkupString)blogPost.Text)
             </div>
             @if (userOID == blogPost.AuthorOID)
             {

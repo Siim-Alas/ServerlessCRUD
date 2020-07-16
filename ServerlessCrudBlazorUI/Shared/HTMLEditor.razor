@@ -1,6 +1,10 @@
-﻿@using ServerlessCrudBlazorUI.Services
+﻿@using BlazorInputFile
+@using ServerlessCrudBlazorUI.Services
+@using ServerlessCrudBlazorUI.Shared.Utilities
 
 @inject QuillClient Quill
+
+@inject ServerlessCrudBlazorUI.Services.APIClients.AnnonymousCrudFunctionAPIClient client
 
 <div @ref="ToolbarReference">
     <select class="ql-header">
@@ -12,37 +16,114 @@
         <option value="5"></option>
     </select>
     <span class="ql-formats">
-        <button class="ql-bold"></button>
-        <button class="ql-italic"></button>
-        <button class="ql-underline"></button>
-        <button class="ql-strike"></button>
+        <select class="ql-font">
+            <option selected=""></option>
+            <option value="serif"></option>
+            <option value="monospace"></option>
+        </select>
+        <select class="ql-size">
+            <option value="small"></option>
+            <option selected=""></option>
+            <option value="large"></option>
+            <option value="huge"></option>
+        </select>
+    </span>
+    <span class="ql-formats">
+        <button class="ql-bold" type="button"></button>
+        <button class="ql-italic" type="button"></button>
+        <button class="ql-underline" type="button"></button>
+        <button class="ql-strike" type="button"></button>
     </span>
     <span class="ql-formats">
         <select class="ql-color"></select>
         <select class="ql-background"></select>
     </span>
     <span class="ql-formats">
-        <button class="ql-list" value="ordered"></button>
-        <button class="ql-list" value="bullet"></button>
+        <button class="ql-script" value="sub" type="button"></button>
+        <button class="ql-script" value="super" type="button"></button>
     </span>
     <span class="ql-formats">
-        <button class="ql-link"></button>
+        <button class="ql-code-block" type="button"></button>
+    </span>
+    <span class="ql-formats">
+        <button class="ql-list" value="ordered" type="button"></button>
+        <button class="ql-list" value="bullet" type="button"></button>
+        <button class="ql-indent" value="-1" type="button"></button>
+        <button class="ql-indent" value="+1" type="button"></button>
+        <select class="ql-align">
+            <option selected=""></option>
+            <option value="center"></option>
+            <option value="right"></option>
+            <option value="justify"></option>
+        </select>
+    </span>
+    <span class="ql-formats">
+        <button class="ql-link" type="button"></button>
+        <!-- Custom Image insertion logic -->
+        <Dropdown @ref="DropdownReference" ChildContentClass="own-ql-dropdown">
+            <Toggler>
+                <button type="button">
+                    <svg viewBox="0 0 18 18">
+                        <rect class="ql-stroke" height="10" width="12" x="3" y="4"></rect>
+                        <circle class="ql-fill" cx="6" cy="7" r="1"></circle>
+                        <polyline class="ql-even ql-fill" points="5 12 5 11 7 9 8 10 11 7 13 9 13 12 5 12"></polyline>
+                    </svg>
+                </button>
+            </Toggler>
+            <ChildContent>
+                <button type="button" @onclick="@(() => { ShowURLPrompt = true; DropdownReference.ShowContent = false; })">Insert URL</button>
+                <button type="button">Uplaod From Computer</button>
+            </ChildContent>
+        </Dropdown>
+        <button class="ql-video" type="button"></button>
+    </span>
+    <span class="ql-formats">
+        <button class="ql-clean" type="button"></button>
     </span>
 </div>
 <div class="text-editor" @ref="EditorReference">
     @Content
 </div>
 
+@if (ShowURLPrompt)
+{
+    <div class="fixed-center width-400px max-width-100 bg-white border p-4">
+        <img src="@ImageUrl" alt="@ImageUrl" class="img-fluid overflow-auto" />
+        <div class="input-group">
+            <input @bind="ImageUrl" @bind:event="oninput" type="url" class="form-control" placeholder="https://..." />
+            <button class="btn" type="button" @onclick="@(async() => { await Quill.InsertImage(EditorReference, ImageUrl); ShowURLPrompt = false; })">Submit</button>
+        </div>
+    </div>
+}
+else if (ShowUploads)
+{
+    <div class="fixed-center bg-white">
+        <img src="https://serverlesscrud.azurewebsites.net/api/GetImage/talvine_maastik.png" />
+        <InputFile OnChange="HandleFileSelected" />
+    </div>
+}
+
 @code {
     [Parameter]
     public MarkupString Content { get; set; }
 
     private ElementReference ToolbarReference { get; set; }
+    private Dropdown DropdownReference { get; set; }
     private ElementReference EditorReference { get; set; }
+
+    private bool ShowURLPrompt { get; set; } = false;
+    private bool ShowUploads { get; set; } = true;
+    private string ImageUrl { get; set; }
 
     public async Task<MarkupString> GetInnerHTML()
     {
         return await Quill.GetHTML(EditorReference);
+    }
+
+    async Task HandleFileSelected(IFileListEntry[] files)
+    {
+        Console.WriteLine(files[0].Name);
+        Console.WriteLine(await client.PostImageAsync(files.FirstOrDefault()));
     }
 
     protected override async Task OnAfterRenderAsync(bool firstRender)

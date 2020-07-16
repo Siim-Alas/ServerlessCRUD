@@ -1,5 +1,6 @@
 ﻿using ServerlessCrudClassLibrary.TableEntities;
 using System;
+using System.IO;
 using System.Net.Http;
 using System.Net.Http.Json;
 using System.Threading.Tasks;
@@ -38,6 +39,20 @@ namespace ServerlessCrudBlazorUI.Services.APIClients
                 return await _client.PostAsJsonAsync(
                     "DeleteBlogPost",
                     blogPost);
+            }
+            catch
+            {
+                return new HttpResponseMessage(System.Net.HttpStatusCode.BadRequest);
+            }
+        }
+
+        public async Task<HttpResponseMessage> PostBlobAsync(string fileName, Stream stream)
+        {
+            try
+            {
+                return await _client.PostAsJsonAsync(
+                    $"UploadBlob/{fileName}",
+                    stream);
             }
             catch
             {
