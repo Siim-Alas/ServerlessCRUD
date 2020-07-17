@@ -4,7 +4,6 @@ using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using ServerlessCrudBlazorUI.Services.APIClients;
-using ServerlessCrudBlazorUI.Services.AuthenticationStateProviders;
 using ServerlessCrudBlazorUI.Services.HttpMessageHandlers;
 using System.Net.Http;
 using System;
@@ -24,7 +23,6 @@ namespace ServerlessCrudBlazorUI
 
             builder.Services.AddBlazoredSessionStorage();
             builder.Services.AddBlazoredLocalStorage();
-            builder.Services.AddScoped<SocialMediaAuthenticationStateProvider>();
 
             builder.Services.AddTransient(options => {
                 return new AuthorizedAuthorizationMessageHandler(
@@ -34,17 +32,13 @@ namespace ServerlessCrudBlazorUI
                     InnerHandler = new HttpClientHandler()
                 };
             });
-            //builder.Services.AddTransient<AuthenticatedAuthorizationMessageHandler>();
 
             // DefaultHttpClientFactory DI does not work in Release configuration.
             ////////////////////////////////////////////////////////////////////////////
             
             //builder.Services.AddHttpClient<AuthorizedCrudFunctionAPIClient>()
             //    .AddHttpMessageHandler<AuthorizedAuthorizationMessageHandler>();
-            //builder.Services.AddHttpClient<AuthenticatedCrudFunctionAPIClient>();
-            //    //.AddHttpMessageHandler<AuthenticatedAuthorizationMessageHandler>();
             //builder.Services.AddHttpClient<AnnonymousCrudFunctionAPIClient>();
-            //builder.Services.AddHttpClient<SocialMediaAccountsAPIClient>();
 
             ////////////////////////////////////////////////////////////////////////////
 
@@ -52,8 +46,6 @@ namespace ServerlessCrudBlazorUI
                 return new HttpClient() { BaseAddress = new Uri("https://serverlesscrud.azurewebsites.net/api/") };
             });
             builder.Services.AddScoped<AnnonymousCrudFunctionAPIClient>();
-            builder.Services.AddSingleton<AuthenticatedCrudFunctionAPIClient>();
-            builder.Services.AddScoped<SocialMediaAccountsAPIClient>();
             builder.Services.AddTransient(options => {
                 return new AuthorizedCrudFunctionAPIClient(
                     new HttpClient(options.GetRequiredService<AuthorizedAuthorizationMessageHandler>()));

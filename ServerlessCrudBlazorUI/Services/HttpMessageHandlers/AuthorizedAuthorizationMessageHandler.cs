@@ -15,9 +15,7 @@ namespace ServerlessCrudBlazorUI.Services.HttpMessageHandlers
                 scopes: new[]
                 {
                     "db944478-cbda-4214-8ad6-7b310465ce97/BlogPosts.Read",
-                    "db944478-cbda-4214-8ad6-7b310465ce97/BlogPosts.Write",
-                    "db944478-cbda-4214-8ad6-7b310465ce97/Comments.Read",
-                    "db944478-cbda-4214-8ad6-7b310465ce97/Comments.Write"
+                    "db944478-cbda-4214-8ad6-7b310465ce97/BlogPosts.Write"
                 });
         }
     }

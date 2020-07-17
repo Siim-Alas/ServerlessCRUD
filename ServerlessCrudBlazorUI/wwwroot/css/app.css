@@ -296,11 +296,12 @@ app {
     }
 
     .centered {
-        width: 90vw;
+        margin: 0;
+        width: 100vw;
     }
 
     .sidebar {
-        width: 100%;
+        min-width: 100vw;
         margin: 20px auto;
     }
 

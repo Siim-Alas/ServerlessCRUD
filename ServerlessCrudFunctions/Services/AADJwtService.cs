@@ -2,7 +2,6 @@
 using Microsoft.IdentityModel.Protocols;
 using Microsoft.IdentityModel.Protocols.OpenIdConnect;
 using Microsoft.IdentityModel.Tokens;
-using ServerlessCrudFunctions.Services.Interfaces;
 using System;
 using System.Collections.Generic;
 using System.IdentityModel.Tokens.Jwt;
@@ -11,7 +10,7 @@ using System.Threading.Tasks;
 
 namespace ServerlessCrudFunctions.Services
 {
-    public class AADJwtService : IJwtService
+    public class AADJwtService
     {
         // Reference: https://github.com/Azure-Samples/ms-identity-dotnet-webapi-azurefunctions
 

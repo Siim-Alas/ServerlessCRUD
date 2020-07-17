@@ -8,7 +8,7 @@
 @inject ILocalStorageService localStorage
 
 <div class="main mb-4">
-    <div class="content pl-4 pb-4">
+    <div class="content p-4">
         <h3>Blog Posts</h3>
 
         @if (hasInitialized)
@@ -16,7 +16,7 @@
             <ul class="list-group">
                 @foreach (BlogPostEntity post in blogPostsOnPage)
                 {
-                    <NavLink class="list-group-item  list-group-item-action"
+                    <NavLink class="list-group-item list-group-item-action my-4"
                              href="@($"/detail/{PrettyPrinter.DateStringFromBlogPostPartitionKey(post.PartitionKey)}/{post.RowKey}")">
                         <div>
                             <h4>

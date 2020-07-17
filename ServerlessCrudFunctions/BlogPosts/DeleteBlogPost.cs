@@ -26,7 +26,6 @@ namespace ServerlessCrudFunctions.BlogPosts
         public async Task<IActionResult> Run(
             [HttpTrigger(AuthorizationLevel.Anonymous, "post", Route = null)] HttpRequest req,
             [Table("blogposts", "AzureWebJobsStorage")] CloudTable blogPostsTable,
-            [Table("comments", "AzureWebJobsStorage")] CloudTable commentsTable,
             [Table("metadata", "AzureWebJobsStorage")] CloudTable metadataTable,
             ILogger log)
         {
@@ -47,25 +46,6 @@ namespace ServerlessCrudFunctions.BlogPosts
                 {
                     // "oid" claim is invalid.
                     return new UnauthorizedResult();
-                }
-
-                // Get and delete the comments on the blog post.
-                TableBatchOperation batchOperation = new TableBatchOperation();
-                TableQuery<CommentEntity> projectionQuery = new TableQuery<CommentEntity>()
-                    .Where(
-                        TableQuery.GenerateFilterCondition(
-                            "PartitionKey",
-                            QueryComparisons.Equal,
-                            CommentEntity.GetPartitionKeyFromBlogPost(blogPost))
-                    ).Select(new string[] { "RowKey" });
-                // NOTE: BatchOperation supports a maximum of 100 operations.
-                foreach (CommentEntity comment in commentsTable.ExecuteQuery(projectionQuery))
-                {
-                    batchOperation.Delete(comment);
-                }
-                if (batchOperation.Count > 0)
-                {
-                    await commentsTable.ExecuteBatchAsync(batchOperation);
                 }
 
                 // Delete the blog post.

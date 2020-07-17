@@ -1,11 +1,9 @@
-﻿using BlazorInputFile;
-using Newtonsoft.Json;
+﻿using Newtonsoft.Json;
 using ServerlessCrudClassLibrary.HttpResponseModels;
 using ServerlessCrudClassLibrary.TableEntities;
 using System;
 using System.Collections.Generic;
 using System.Net.Http;
-using System.Net.Http.Headers;
 using System.Net.Http.Json;
 using System.Threading.Tasks;
 
@@ -55,19 +53,6 @@ namespace ServerlessCrudBlazorUI.Services.APIClients
             {
                 return await _client.GetFromJsonAsync<BlogPostEntity>(
                     $"GetBlogPost?partitionkey={partitionKey}&rowkey={rowKey}");
-            }
-            catch
-            {
-                return null;
-            }
-        }
-
-        public async Task<CommentEntity[]> GetCommentsOnBlogPost(BlogPostEntity blogPost)
-        {
-            try
-            {
-                return await _client.GetFromJsonAsync<CommentEntity[]>(
-                    $"GetCommentsOnBlogPost?commentpartitionkey={blogPost.PartitionKey}_{blogPost.RowKey}");
             }
             catch
             {

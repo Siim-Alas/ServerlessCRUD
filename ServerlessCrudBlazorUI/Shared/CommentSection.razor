@@ -1,121 +1,20 @@
-﻿@using ServerlessCrudClassLibrary.HttpRequestModels
-@using ServerlessCrudClassLibrary.TableEntities
-@using System.Security.Claims
-@using ServerlessCrudBlazorUI.Services.AuthenticationStateProviders
-@using ServerlessCrudBlazorUI.Services.APIClients
+﻿@using ServerlessCrudClassLibrary.TableEntities
 
-@inject AnnonymousCrudFunctionAPIClient annonymousClient
-@inject AuthenticatedCrudFunctionAPIClient authenticatedClient
-@inject SocialMediaAccountsAPIClient socialMediaClient
 @inject NavigationManager navigationManager
-@inject SocialMediaAuthenticationStateProvider socialMediaAuthStateProvider
+@inject IJSRuntime JsRuntime
 
 <div class="comment-section">
-    <h4>Comments</h4>
-
-    @if (newComment == null)
-    {
-        <div>
-            <p>
-                Log in to comment.
-            </p>
-            <button class="google-login-button" type="button" @onclick="socialMediaClient.LogInWithGoogle"></button>
-            <button class="facebook-login-button" type="button" @onclick="socialMediaClient.LogInWithFacebook">
-                <img src="Images/f_logo_RGB-White_58.png" width="24" height="24" />&thinsp;
-                <b class="text-white">Login with Facebook</b>
-            </button>
-        </div>
-    }
-    else
-    {
-        <EditForm Model="newComment" OnValidSubmit="OnValidSubmit">
-            <DataAnnotationsValidator />
-            <ValidationSummary />
-            <div class="form-group">
-                <label for="text">Text</label>
-                <InputTextArea id="text" class="form-control" rows="3" @bind-Value="newComment.Text"></InputTextArea>
-            </div>
-
-            <button class="btn btn-dark" type="submit">Comment</button>
-        </EditForm>
-    }
-    <ul class="list-group">
-            @if (hasLoaded)
-            {
-                foreach (CommentEntity comment in comments)
-                {
-                <li class="list-group-item">
-                    <b>@comment.Author</b>
-                    <p class="text-muted">Posted on @comment.Timestamp.ToLocalTime().ToString("HH:mm d MMMM yyyy")</p>
-                    <p class="multiline">@comment.Text</p>
-                </li>
-            }
-        }
-    </ul>
+    <div id="disqus_thread"></div>
 </div>
 
 @code {
     [Parameter]
     public BlogPostEntity BlogPost { get; set; }
 
-    private ClaimsPrincipal user { get; set; }
-    private PostCommentEntityRequest.IdentityProviders provider
-    {
-        get
-        {
-            switch (user.Identity.AuthenticationType)
-            {
-                case SocialMediaAuthenticationStateProvider.FacebookAuthenticationType:
-                    return PostCommentEntityRequest.IdentityProviders.Facebook;
-                case SocialMediaAuthenticationStateProvider.GoogleAuthenticationType:
-                    return PostCommentEntityRequest.IdentityProviders.Google;
-                default:
-                    return PostCommentEntityRequest.IdentityProviders.Facebook;
-            }
-        }
-    }
-    private CommentEntity newComment { get; set; }
-    private CommentEntity[] comments { get; set; }
-    private bool hasLoaded { get; set; } = false;
-
-    private async Task OnValidSubmit()
-    {
-        if (newComment.IsValid && user.Identity.IsAuthenticated)
-        {
-            await authenticatedClient.PostCommentEntityAsync(new PostCommentEntityRequest(
-                    newComment,
-                    provider,
-                    user.FindFirst("userId").Value,
-                    user.FindFirst("token").Value
-                ));
-            newComment = new CommentEntity(BlogPost, user.Identity.Name, "...");
-            await this.OnParametersSetAsync();
-        }
-    }
-
-    protected override async Task OnInitializedAsync()
-    {
-        await base.OnInitializedAsync();
-
-        user = (await socialMediaAuthStateProvider.GetAuthenticationStateAsync()).User;
-
-        socialMediaAuthStateProvider.AuthenticationStateChanged += (Task<AuthenticationState> task) =>
-        {
-            user = task.Result.User;
-            newComment = (user.Identity.IsAuthenticated) ? new CommentEntity(BlogPost, user.Identity.Name, "...") : null;
-            this.StateHasChanged();
-        };
-    }
-
     protected override async Task OnParametersSetAsync()
     {
         await base.OnParametersSetAsync();
 
-        comments = (await annonymousClient.GetCommentsOnBlogPost(BlogPost)) ?? new CommentEntity[0];
-        if (user.Identity.IsAuthenticated)
-        {
-            newComment = new CommentEntity(BlogPost, user.Identity.Name, "...");
-        }
-        hasLoaded = true;
+        await JsRuntime.InvokeVoidAsync("DisqusClient.init", navigationManager.Uri, null);
     }
 }

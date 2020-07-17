@@ -3,13 +3,12 @@
 @using System.Security.Claims
 @using ServerlessCrudClassLibrary.TableEntities
 @using ServerlessCrudBlazorUI.Services
-@using ServerlessCrudBlazorUI.Services.APIClients
 
 @inject BlogPostService blogPostService
 @inject AuthenticationStateProvider authStateProvider
 
 <div class="main mb-4">
-    <div class="content pl-4 pb-4">
+    <div class="content p-4">
         @if (hasLoaded)
         {
             <div>
