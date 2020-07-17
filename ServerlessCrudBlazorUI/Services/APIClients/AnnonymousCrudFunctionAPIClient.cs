@@ -35,6 +35,18 @@ namespace ServerlessCrudBlazorUI.Services.APIClients
                 return new HttpResponseMessage(System.Net.HttpStatusCode.BadRequest);
             }
         }
+        public async Task<string[]> ListImageNamesAsync()
+        {
+            try
+            {
+                return await _client.GetFromJsonAsync<string[]>("ListImageNames");
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e);
+                return new string[0];
+            }
+        }
         // EndTemp
 
         public async Task<QueryBlogPostEntitiesResponse> GetQueryBlogPostsResponseAsync(

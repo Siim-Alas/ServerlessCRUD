@@ -72,7 +72,7 @@
             </Toggler>
             <ChildContent>
                 <button type="button" @onclick="@(() => { ShowURLPrompt = true; DropdownReference.ShowContent = false; })">Insert URL</button>
-                <button type="button">Uplaod From Computer</button>
+                <button type="button" @onclick="@(() => { ShowUploads = true; DropdownReference.ShowContent = false; })">Uplaod From Computer</button>
             </ChildContent>
         </Dropdown>
         <button class="ql-video" type="button"></button>
@@ -97,10 +97,23 @@
 }
 else if (ShowUploads)
 {
-    <div class="fixed-center bg-white">
-        <img src="https://serverlesscrud.azurewebsites.net/api/GetImage/talvine_maastik.png" />
-        <InputFile OnChange="HandleFileSelected" />
+<div class="fixed-center bg-white">
+
+    <div class="card-columns p-4">
+        @foreach (string name in ImageNames)
+        {
+            <div class="card" @onclick="@(async() => { await Quill.InsertImage(EditorReference, $"https://serverlesscrud.azurewebsites.net/api/GetImage/{name}"); ShowUploads = false; })">
+                <div class="card-img-top">
+                    <img class="img-fluid" src="@($"https://serverlesscrud.azurewebsites.net/api/GetImage/{name}")" />
+                </div>
+                <div class="card-body">
+                    <b>@name</b>
+                </div>
+            </div>
+        }
     </div>
+    <InputFile OnChange="HandleFileSelected" />
+</div>
 }
 
 @code {
@@ -112,7 +125,8 @@ else if (ShowUploads)
     private ElementReference EditorReference { get; set; }
 
     private bool ShowURLPrompt { get; set; } = false;
-    private bool ShowUploads { get; set; } = true;
+    private bool ShowUploads { get; set; } = false;
+    private string[] ImageNames { get; set; } = new string[0];
     private string ImageUrl { get; set; }
 
     public async Task<MarkupString> GetInnerHTML()
@@ -122,8 +136,14 @@ else if (ShowUploads)
 
     async Task HandleFileSelected(IFileListEntry[] files)
     {
-        Console.WriteLine(files[0].Name);
-        Console.WriteLine(await client.PostImageAsync(files.FirstOrDefault()));
+        await client.PostImageAsync(files.FirstOrDefault());
+        ImageNames = await client.ListImageNamesAsync();
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        await base.OnInitializedAsync();
+        ImageNames = await client.ListImageNamesAsync();
     }
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
