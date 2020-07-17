@@ -10,6 +10,15 @@ a, .btn-link {
     color: #0366d6;
 }
 
+img {
+    max-width: 100%;
+    height: auto;
+}
+
+.pointer-cursor:hover {
+    cursor: pointer;
+}
+
 .blog-post > p {
     margin: 0;
 }
@@ -37,6 +46,7 @@ a, .btn-link {
 .own-ql-dropdown button {
     height: auto !important;
     width: auto !important;
+    white-space: nowrap;
 }
 
 .own-login-dropdown {

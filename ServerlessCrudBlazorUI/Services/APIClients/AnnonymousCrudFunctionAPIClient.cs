@@ -20,34 +20,6 @@ namespace ServerlessCrudBlazorUI.Services.APIClients
             _client = client;
             //_client.BaseAddress = new Uri("https://serverlesscrud.azurewebsites.net/api/");
         }
-        // Temp
-        public async Task<HttpResponseMessage> PostImageAsync(IFileListEntry file)
-        {
-            try
-            {
-                StreamContent content = new StreamContent(file.Data);
-                content.Headers.ContentType = new MediaTypeHeaderValue(file.Type);
-                return await _client.PostAsync($"UploadImage/{file.Name}", content);
-            }
-            catch (Exception e)
-            {
-                Console.WriteLine(e);
-                return new HttpResponseMessage(System.Net.HttpStatusCode.BadRequest);
-            }
-        }
-        public async Task<string[]> ListImageNamesAsync()
-        {
-            try
-            {
-                return await _client.GetFromJsonAsync<string[]>("ListImageNames");
-            }
-            catch (Exception e)
-            {
-                Console.WriteLine(e);
-                return new string[0];
-            }
-        }
-        // EndTemp
 
         public async Task<QueryBlogPostEntitiesResponse> GetQueryBlogPostsResponseAsync(
             int skip = 0,

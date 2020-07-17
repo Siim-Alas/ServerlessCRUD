@@ -1,7 +1,9 @@
-﻿using ServerlessCrudClassLibrary.TableEntities;
+﻿using BlazorInputFile;
+using ServerlessCrudClassLibrary.TableEntities;
 using System;
 using System.IO;
 using System.Net.Http;
+using System.Net.Http.Headers;
 using System.Net.Http.Json;
 using System.Threading.Tasks;
 
@@ -46,17 +48,30 @@ namespace ServerlessCrudBlazorUI.Services.APIClients
             }
         }
 
-        public async Task<HttpResponseMessage> PostBlobAsync(string fileName, Stream stream)
+        public async Task<HttpResponseMessage> PostImageAsync(IFileListEntry file)
         {
             try
             {
-                return await _client.PostAsJsonAsync(
-                    $"UploadBlob/{fileName}",
-                    stream);
+                StreamContent content = new StreamContent(file.Data);
+                content.Headers.ContentType = new MediaTypeHeaderValue(file.Type);
+                return await _client.PostAsync($"UploadImage/{file.Name}", content);
             }
-            catch
+            catch (Exception e)
             {
+                Console.WriteLine(e);
                 return new HttpResponseMessage(System.Net.HttpStatusCode.BadRequest);
+            }
+        }
+        public async Task<string[]> ListImageNamesAsync()
+        {
+            try
+            {
+                return await _client.GetFromJsonAsync<string[]>("ListImageNames");
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e);
+                return new string[0];
             }
         }
     }

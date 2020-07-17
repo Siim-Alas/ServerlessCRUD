@@ -1,10 +1,11 @@
 ﻿@using BlazorInputFile
-@using ServerlessCrudBlazorUI.Services
 @using ServerlessCrudBlazorUI.Shared.Utilities
+@using ServerlessCrudBlazorUI.Services
+@using ServerlessCrudBlazorUI.Services.APIClients
 
 @inject QuillClient Quill
 
-@inject ServerlessCrudBlazorUI.Services.APIClients.AnnonymousCrudFunctionAPIClient client
+@inject AuthorizedCrudFunctionAPIClient client
 
 <div @ref="ToolbarReference">
     <select class="ql-header">
@@ -71,8 +72,12 @@
                 </button>
             </Toggler>
             <ChildContent>
-                <button type="button" @onclick="@(() => { ShowURLPrompt = true; DropdownReference.ShowContent = false; })">Insert URL</button>
-                <button type="button" @onclick="@(() => { ShowUploads = true; DropdownReference.ShowContent = false; })">Uplaod From Computer</button>
+                <button type="button" @onclick="@(() => { ShowURLPrompt = true; DropdownReference.ShowContent = false; })">
+                    <span class="oi oi-globe" aria-hidden="true"></span> URL
+                </button>
+                <button type="button" @onclick="@(() => { ShowUploads = true; DropdownReference.ShowContent = false; })">
+                    <span class="oi oi-folder" aria-hidden="true"></span> Uploads
+                </button>
             </ChildContent>
         </Dropdown>
         <button class="ql-video" type="button"></button>
@@ -88,32 +93,39 @@
 @if (ShowURLPrompt)
 {
     <div class="fixed-center width-400px max-width-100 bg-white border p-4">
-        <img src="@ImageUrl" alt="@ImageUrl" class="img-fluid overflow-auto" />
+        <div class="d-inline-flex w-100 justify-content-between">
+            <h3>Insert URL</h3>
+            <span class="oi oi-x pointer-cursor" aria-hidden="true" @onclick="@(() => { ShowURLPrompt = false; })"></span>
+        </div>
+        <img src="@ImageUrl" alt="@ImageUrl" class="overflow-auto" />
         <div class="input-group">
             <input @bind="ImageUrl" @bind:event="oninput" type="url" class="form-control" placeholder="https://..." />
-            <button class="btn" type="button" @onclick="@(async() => { await Quill.InsertImage(EditorReference, ImageUrl); ShowURLPrompt = false; })">Submit</button>
+            <button class="btn" type="button" @onclick="@(async() => { await Quill.InsertImage(EditorReference, ImageUrl); ShowURLPrompt = false; })">Insert Image</button>
         </div>
     </div>
 }
 else if (ShowUploads)
 {
-<div class="fixed-center bg-white">
-
-    <div class="card-columns p-4">
-        @foreach (string name in ImageNames)
-        {
-            <div class="card" @onclick="@(async() => { await Quill.InsertImage(EditorReference, $"https://serverlesscrud.azurewebsites.net/api/GetImage/{name}"); ShowUploads = false; })">
-                <div class="card-img-top">
-                    <img class="img-fluid" src="@($"https://serverlesscrud.azurewebsites.net/api/GetImage/{name}")" />
+    <div class="fixed-center bg-white p-4 border max-width-100" style="z-index:90;">
+        <div class="d-inline-flex w-100 justify-content-between">
+            <h3>Uploaded Images</h3>
+            <span class="oi oi-x pointer-cursor" aria-hidden="true" @onclick="@(() => { ShowUploads = false; })"></span>
+        </div>
+        <div class="card-columns p-4">
+            @foreach (string name in ImageNames)
+            {
+                <div class="card pointer-cursor" @onclick="@(async() => { await Quill.InsertImage(EditorReference, $"https://serverlesscrud.azurewebsites.net/api/GetImage/{name}"); ShowUploads = false; })">
+                    <div class="card-img-top">
+                        <img src="@($"https://serverlesscrud.azurewebsites.net/api/GetImage/{name}")" />
+                    </div>
+                    <div class="card-body">
+                        <b>@name</b>
+                    </div>
                 </div>
-                <div class="card-body">
-                    <b>@name</b>
-                </div>
-            </div>
-        }
+            }
+        </div>
+        <InputFile OnChange="HandleFileSelected" />
     </div>
-    <InputFile OnChange="HandleFileSelected" />
-</div>
 }
 
 @code {
