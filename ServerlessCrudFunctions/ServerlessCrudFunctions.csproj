@@ -15,7 +15,7 @@
     <PackageReference Include="Microsoft.IdentityModel.Protocols" Version="6.7.1" />
     <PackageReference Include="Microsoft.IdentityModel.Protocols.OpenIdConnect" Version="6.7.1" />
     <PackageReference Include="Microsoft.NET.Sdk.Functions" Version="3.0.8" />
-    <PackageReference Include="System.IdentityModel.Tokens.Jwt" Version="6.7.1" />
+    <PackageReference Include="System.IdentityModel.Tokens.Jwt" Version="6.34.0" />
     <PackageReference Include="System.Net.Http.Json" Version="3.2.1" />
   </ItemGroup>
   <ItemGroup>
